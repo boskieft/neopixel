@@ -1,7 +1,7 @@
-version: "0.1.0"
+version: "0.3.0"
 description: "Neopixel driver for ESP32xx using I2S"
-url: "https://github.com/Boskieft/neopixel"
-repository: "https://github.com/Boskieft/neopixel.git"
+url: "https://github.com/boskieft/neopixel"
+repository: "https://github.com/boskieft/neopixel.git"
 license: "MIT"
 dependencies:
   idf: ">=5.5.5"
