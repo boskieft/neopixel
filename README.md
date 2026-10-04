@@ -49,6 +49,7 @@ Tested successfully on the ESP32xx devices listed below.
 Please refer to the "examples" and "docs" folders in this driver.
 
 ## @@@TODO topics
+
 Installation
 Quick start
 PixelType
