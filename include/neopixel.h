@@ -28,7 +28,7 @@
 ===================================================================================================
 */
 typedef union alignas(uint32_t) UnionPixelColor {
-    uint32_t value; // set as 0x(ww)rrggbb
+    uint32_t value; // set as 0x(ww)rrggbb. NOTE: this is regardless of GRB(W) ordering of the transmission to the Neopixels
 
     struct StructPixelColor { // set as .b, .g, .r (, .w) bytes, order CANNOT be changed (Big/Little-Endian issue)
         uint8_t b;
@@ -134,6 +134,13 @@ class NeopixelDriver {
         bufferSize = 0;
         nrPixels = 0;
     }
+
+    // Delete copy and move constructors and assignment operators, to prevent copying/moving the driver instance
+    NeopixelDriver(const NeopixelDriver &) = delete;
+    NeopixelDriver &operator=(const NeopixelDriver &) = delete;
+
+    NeopixelDriver(NeopixelDriver &&) = delete;
+    NeopixelDriver &operator=(NeopixelDriver &&) = delete;
 
     //-------------------------------------------
     //  Basic functions

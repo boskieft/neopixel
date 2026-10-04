@@ -39,6 +39,11 @@ bool NeopixelDriver<Mode>::begin(
         return (false);
     }
 
+    if (buffer != nullptr) {
+        ESP_LOGE(TAG, "Already initialised");
+        return (false);
+    }
+
     if constexpr (Mode == PixelType::GRB_SEQ3) {
         //---------------------------------------
         //  GRB, seq3 timing

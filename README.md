@@ -10,13 +10,13 @@ Features:
 - **ESP-IDF:** Works with and without the Arduino framework.
 - **I2S:** Using standard I2s driver of ESP-IDF 5.5:
   - DMA for minimal processor load and interrupts
-  - Keeps SPI with DMA avaialble for other purposes
+  - Keeps SPI with DMA available for other purposes
 - **GRB/GRBW:** Configurable for GRB (3 colors) or GRBW (3 colors + white) Neopixels.
 - **SEQ3/SEQ4:** Configurable for best match on your Neopixel's timing:
   - 3 bit sequence, period=1200ns, dutycycle: Off=33%, On=67%
   - 4 bit sequence, period=1200ns, dutycycle: Off=25%, On=50%
-- **1...N:** Drives 1 upto many thousants of Neopixels, only limited by the available RAM.
-- **Fast:** Driver waits for transmission completion in seperate task.
+- **1...N:** Drives 1 up to many thousants of Neopixels, only limited by the available RAM.
+- **Fast:** Driver waits for transmission completion in separate task.
 - **Easy:** No polling, no throttling, the driver takes care.
 - **Rotate:** In-memory left or right rotation
 - **Fill:** In-memory color filling for a range of Neopixels (or all of them)
@@ -47,3 +47,16 @@ Tested successfully on the ESP32xx devices listed below.
 ## Examples and Documentation
 
 Please refer to the "examples" and "docs" folders in this driver.
+
+## @@@TODO topics
+Installation
+Quick start
+PixelType
+RGB vs RGBW
+SEQ3 vs SEQ4
+Brightness
+show() behavior
+Memory usage
+Supported chips
+ESP-IDF version
+pioArduino example
