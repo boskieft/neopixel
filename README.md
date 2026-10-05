@@ -44,6 +44,12 @@ Tested successfully on the ESP32xx devices listed below.
 
 @@@TODO: briefly describe: ESP-IDF, pioarduino and Arduino
 
+## Development (dev) folder
+
+This repository is an ESP-IDF component (aka: library). The `dev` folder contains a small ESP-IDF development project used to configure and test the component without changing the reusable component layout.
+
+See the README.md in the `dev` folder on how to use it.
+
 ## Examples and Documentation
 
 Please refer to the "examples" and "docs" folders in this driver.
