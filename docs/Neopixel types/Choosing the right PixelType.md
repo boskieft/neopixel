@@ -1,4 +1,4 @@
-# Choosing the right \<NeopixelType\>
+# Choosing the right \<PixelType\>
 
 When declaring a Neopixel driver, specify which type to use:
 
@@ -13,9 +13,9 @@ NeopixelDriver\<PixelType::GRB_SEQ3\> npx;
 
 ## GRB or GRBW colors
 
-This simplty depends on whether the Neopixels have a separate white (W) color LED inside.
+This simply depends on whether the Neopixels have a separate white (W) color LED inside.
 
-The usual order to send the colors to Neopixels is Green-Red-Blue, hence the GRB naming i/o RGB.
+The usual order to send the colors to Neopixels is Green-Red-Blue, hence the GRB naming instead of RGB.
 
 Currently, the driver does not support other color sequences.
 
@@ -40,15 +40,15 @@ The total number of bits that will be transmitted over I2S depends on the number
 
 As a result, the required RAM memory per Neopixel is:
 
-- **<GRB_SEQ3>:** 3 colors \* 1 byte per color \* 3 I2S bits per color bit = 9 bytes
-- **<GRB_SEQ4>:** 3 colors \* 1 byte per color \* 4 I2S bits per color bit = 12 bytes
-- **<GRBW_SEQ3>:** 4 colors \* 1 byte per color \* 3 I2S bits per color bit = 12 bytes
-- **<GRBW_SEQ4>:** 4 colors \* 1 byte per color \* 4 I2S bits per color bit = 16 bytes
+- **<GRB_SEQ3>:** 3 colors \* 1 byte per color \* 3 I2S bits per color bit = 9 bytes * 2 (DMA copy) = 18 bytes
+- **<GRB_SEQ4>:** 3 colors \* 1 byte per color \* 4 I2S bits per color bit = 12 bytes * 2 (DMA copy) = 24 bytes
+- **<GRBW_SEQ3>:** 4 colors \* 1 byte per color \* 3 I2S bits per color bit = 12 bytes * 2 (DMA copy) = 24 bytes
+- **<GRBW_SEQ4>:** 4 colors \* 1 byte per color \* 4 I2S bits per color bit = 16 bytes * 2 (DMA copy) = 32 bytes
 
 Note: the total RAM usage of this driver is higher, see @@@TODO
 
 ### Recommendation for choosing SEQ3 or SEQ4
 
-In pratice, SEQ3 often works fine anyway, while requiring less RAM memory than SEQ4 per Neopixel.
+In practice, SEQ3 often works fine anyway, while requiring less RAM memory than SEQ4 per Neopixel.
 
 When facing glitches or strange colors, use SEQ4 instead of SEQ3.
