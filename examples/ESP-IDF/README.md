@@ -27,6 +27,10 @@ ESP-IDF-blink
 |-- README.md (this file)
 ```
 
+### NOTE on red squiggles
+
+Looking into the *.cpp files you may see red squiggles under the #includes. This will be solved in the next step: Configure.
+
 ## Configure
 
 In left sidebar of VSC, select `ESP-IDF: Explorer`
@@ -68,6 +72,7 @@ The next files and folders are **added** now:
 
 ```text
 ESP-IDF-blink
+|-- build
 |-- managed components
 |     |-- neopixel
 |           |-- ...
@@ -130,7 +135,7 @@ From here, the logging is about the application.
 
 ## Rebuild from scratch
 
-Remove the files and folders that were added after Confufure (see above, paragraph: `Added files after Configure`).
+Remove the files and folders that were added after Confufure (see above, paragraph: `Added files after Configure`). No need to remove the `build` folder, this will be done by Fullclean.
 
 In short, remove:
 
