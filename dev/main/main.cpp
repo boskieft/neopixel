@@ -9,6 +9,7 @@
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "neopixel.h"
+#include "esp_timer.h"
 
 static const char *TAG = "BLINK";
 
@@ -51,7 +52,7 @@ static const gpio_num_t dataPin = GPIO_NUM_2;    // output data pin to DI of Neo
 
 /*
 -----------------------------------------------------------
-    Classic on/off status LED
+    Classic on/off Status LED as heartbeat
 -----------------------------------------------------------
 */
 static void configureStatusLed(void) {
@@ -60,17 +61,21 @@ static void configureStatusLed(void) {
     gpio_set_direction(statusLedPin, GPIO_MODE_OUTPUT);
 }
 
-static void blinkStatusLed(bool isOn) {
-    gpio_set_level(statusLedPin, !isOn); // LED is active low
+static void toggleStatusLed(void) {
+    static bool isOn = false;
+    gpio_set_level(statusLedPin, isOn);
+    isOn = !isOn;
 }
 
 /*
 -----------------------------------------------------------
-    Neopixel LED
+    Neopixels
+
+    Using one assemby of 9 rings with GRBW NeoPixels
 -----------------------------------------------------------
 */
-NeopixelDriver<PixelType::GRB_SEQ3> npx;
-#define PIXEL_COUNT 1
+NeopixelDriver<PixelType::GRBW_SEQ3> npx;
+static const size_t ringSize = (1 + 8 + 12 + 16 + 24 + 32 + 40 + 48 + 60);
 
 void startNeopixel(void) {
     if (enablePin != GPIO_NUM_NC) {
@@ -85,19 +90,83 @@ void startNeopixel(void) {
     esp_log_level_set("NPIX", ESP_LOG_DEBUG);
     esp_log_level_set("I2S_", ESP_LOG_DEBUG);
 
-    npx.begin(1, dataPin);           // just one (1) pixel for this example
+    npx.begin(ringSize, dataPin);    // just one (1) pixel for this example
     npx.setAllPixels(neopixelBlack); // set all pixels to black
     npx.show();                      // send the data to the Neopixel ring
     npx.brightness = 0x10;           // medium brightness
 }
 
-void blinkNeopixel(bool isOn) {
-    if (isOn) {
-        npx.setPixel(0, neopixelRed);
-    } else {
-        npx.setPixel(0, neopixelBlack);
-    }
+bool walkingPixel(PixelColor walkingColor) {
+    static int coloredIndex = 0;
+    static int blackIndex = ringSize - 1;
+
+    npx.setPixel(blackIndex, neopixelBlack);  // erase previously colored pixel
+    npx.setPixel(coloredIndex, walkingColor); // set new colored pixel
     npx.show();
+
+    // Update the pixel indexes for the next iteration
+    blackIndex = coloredIndex;
+    if (++coloredIndex >= ringSize) {
+        // New loop
+        coloredIndex = 0;
+        return (true); // indicate that a new loop will be started
+    }
+    return (false);
+}
+
+bool walkingPixelAllColors(void) {
+    static int colorIndex = 0;
+    static PixelColor walkingColor = neopixelRed;
+
+    if (walkingPixel(walkingColor)) {
+        switch (colorIndex++) {
+        case 0:
+            walkingColor = neopixelGreen;
+            break;
+        case 1:
+            walkingColor = neopixelBlue;
+            break;
+        case 2:
+            walkingColor = neopixelWhite_RGBW;
+            break;
+        default:
+            walkingColor = neopixelRed;
+            colorIndex = 0;
+            return (true); // indicate that a new loop will be started
+            break;
+        }
+    }
+    return (false);
+}
+
+void animateNeopixels(int64_t currentMicros) {
+    static int animationStep = 0;
+    static int64_t animationTimeoutMicros = 0;
+
+    switch (animationStep) {
+    case 0:
+        if (walkingPixelAllColors()) {
+            animationStep++;
+        }
+        break;
+
+    case 1: {
+        auto oldBrightness = npx.brightness;
+        npx.brightness = 0x03; // set very low brightness, because all Neopixels will be lit
+        npx.setAllPixels(neopixelBlue);
+        npx.show();
+        npx.brightness = oldBrightness;
+        animationStep++;
+        animationTimeoutMicros = currentMicros + 3000000; // 3 second delay before resetting the animation
+        break;
+    }
+
+    default:
+        if (currentMicros - animationTimeoutMicros >= 0) {
+            animationStep = 0; // reset the animation step to loop the animation
+        }
+        break;
+    }
 }
 
 /*
@@ -109,14 +178,15 @@ extern "C" void app_main(void) {
     configureStatusLed();
     startNeopixel();
 
-    bool isOn = true;
+    int64_t currentMicros = esp_timer_get_time();
+    int64_t toggleTimeoutMicros = currentMicros;
 
     while (1) {
-        blinkStatusLed(isOn);
-        blinkNeopixel(isOn);
-
-        /* Toggle the LED state */
-        isOn = !isOn;
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        currentMicros = esp_timer_get_time();
+        if (currentMicros - toggleTimeoutMicros >= 0) {
+            toggleStatusLed();
+            toggleTimeoutMicros = currentMicros + 100000; // 100 ms
+        }
+        animateNeopixels(currentMicros);
     }
 }
