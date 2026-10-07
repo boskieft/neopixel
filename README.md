@@ -48,7 +48,7 @@ Tested successfully on the ESP32xx devices listed below.
 
 This repository is an ESP-IDF component (aka: library).
 
-For development purposes, the `dev` folder contains a small ESP-IDF development project used to configure and test the component without changing the reusable component layout. The repository root `CMakeLists.txt` supports direct ESP-IDF commands from this workspace while still acting as a reusable component when included elsewhere. This way, the component can be easily be tested without having a separate test program.
+For development purposes, the `dev` folder contains a small ESP-IDF development project used to configure and test the component without changing the reusable component layout. The repository root `CMakeLists.txt` supports direct ESP-IDF commands from this workspace while still acting as a reusable component when included elsewhere. This way, the component can easily be tested without having a separate test program.
 
 See the README.md in the `dev` folder on how to use it.
 
