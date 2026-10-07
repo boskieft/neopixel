@@ -1,20 +1,20 @@
-# How to use ESP-IDF
+# How to build using ESP-IDF
 
-Espressif's ESP-IDF can be used to build and test the driver itself, or a separate test program.
+Espressif's ESP-IDF can be used to build and test an ESP-IDF example from this folder.
 
 ## Software required
 
 Virtual Studio Code (VSC) with the "ESP-IDF" extension version 5.5.5 or higher (here version 6.1.0 was used).
 
-## Open folder
+## Select an ESP-IDF example
 
-Copy/Clone the files from an example (e.g. examples\ESP-IDF\Blink) into a project folder, so for example: `<YourPath>\ESP-IDF-blink`
+Copy/Clone the files from an example (e.g. examples\ESP-IDF\Blink) into a local project folder, so for example: `<YourPath>\ESP-IDF-blink`
 
 VSC -> File -> Open Folder...
 
 * Browse and use [Select folder]
 
-In VSC Explorer, the minimum file structure for a `test program` should look similar to this
+In VSC Explorer, the minimum file structure for an example should look similar to this
 
 ```text
 ESP-IDF-blink
@@ -24,12 +24,16 @@ ESP-IDF-blink
 |    |-- idf_component.yml
 |
 |-- CMakeLists.txt
-|-- README.md (this file)
+|-- README.md   (optional)
 ```
 
-### NOTE on red squiggles
+### NOTE on red squiggles and warnings
 
-Looking into the *.cpp files you may see red squiggles under the #includes. This will be solved in the next step: Configure.
+Looking into the *.cpp file(s) you may see red squiggles under the #includes, complaining that these files cannot be opened.
+
+You may also get a VSC popup [Scan for kits] to set the compiler.
+
+You can ignore all this, it will be solved in the next step: Configure.
 
 ## Configure
 
@@ -38,33 +42,15 @@ In left sidebar of VSC, select `ESP-IDF: Explorer`
 ESP-IDF: Explorer -> `Set current ESP-IDF version`
 
 * Select e.g. `Version: v6.1.0`
+* (this will update .vscode/settings.json)
 
 ESP-IDF: Explorer -> `Set Espressif Device Target (IDF_TARGET)`
 
 * Select your ESP32xx device from the list, e.g. `esp32c3`
 * Next, you must specify what type exactly, e.g. `ESP32-C3 chip (via buildin USB-JTAG)`
+* (once again this will update .vscode/settings.json)
 
-In the VSC [Output] window the next text appears:
-
-```text
-    Open On-Chip Debugger v0.12.0-esp32-20260703 (2026-07-03-13:40)
-    ...
-    [Set Target]
-    Running IDF Set Target action
-    ...
-    -- Configuring done (17.9s)
-    -- Generating done (1.1s)
-    -- Build files have been written to: <YourPath>/ESP-IDF-blink/build
-
-    Adding "set-target"'s dependency "fullclean" to list of commands with default set of options.
-    Executing action: fullclean
-    Executing action: set-target
-    Set Target to: esp32c6, new sdkconfig will be created.
-    Running cmake in directory <YourPath>\ESP-IDF-blink\build
-    Executing "cmake -G Ninja -B <YourPath>\ESP-IDF-blink\build -DPYTHON_DEPS_CHECKED=1 -DPYTHON=C:\Espressif\tools\python\v6.1\venv\Scripts\python.exe -DESP_PLATFORM=1 -DIDF_TARGET=esp32c6 -DCCACHE_ENABLE=False <YourPath>\ESP-IDF-blink"...
-
-    Target ESP32C6 Set Successfully.
-```
+In the right hand corner of the VSC screen (or in the VSC [Output] window) you can see the progress. After a short time, "(i) Target ESP32C3 Set Successfully." is shown.
 
 ### Added files after Configure
 
@@ -80,6 +66,8 @@ ESP-IDF-blink
 |-- dependencies.lock
 |-- sdkconfig
 ```
+
+And the file `.vscode\settings.json` is updated to your local build environment.
 
 ## Build
 
@@ -97,45 +85,69 @@ nvs,data,nvs,0x9000,24K,
 phy_init,data,phy,0xf000,4K,
 factory,app,factory,0x10000,1M,
 *******************************************************************************
-[xxx/yyy] compile and link files
+[xxx/yyy] compile and link files    <- gets udated very fast
 ```
 
-Finally, you get a table with memory usage.
+Finally, you get a table with memory usage, and a popup "(i) Build Successful" in the lower part of the VSC screen.
 
-## Select port for USB-C
+## Select Port to Use (for USB-C)
 
 ESP-IDF: Explorer -> `Select Port to Use (COM, tty, usbserial)`
 
-* Select `detect - Auto-detect port (let esptool.py find the device automatically)
+* Select `detect - Auto-detect port (let esptool.py find the device automatically)`
+* (this will update .vscode/settings.json)
 
-In the blue VSC bar on the bottom, the selected COMxx port is shown, next to a plug symbol.
+VSC [Terminal] will show the progress:
+
+```code
+Found 7 serial ports...
+Serial port COM10:
+Connecting...
+Connected to ESP32-C3 on COM10:
+Chip type:          ESP32-C3 (QFN32) (revision v0.4)
+Features:           Wi-Fi, BT 5 (LE), Single Core, 160MHz, Embedded Flash 4MB (XMC)
+Crystal frequency:  40MHz
+USB mode:           USB-Serial/JTAG
+...
+Hard resetting via RTS pin...
+```
+
+In the blue VSC bar on the bottom, the selected COM10 port is shown, next to a plug symbol.
 
 ## Build, Flash and Monitor
 
 ESP-IDF: Explorer -> `Build, Flash and Monitor`
 
-* Software will be flashed to the ESP32xx device
-* Terminal will be started and show the logging
+The first time, Select Flash Method" is shown on the top the the VSC screen
+
+* Select `UART`
+* (this will update .vscode/settings.json)
+
+The software will be flashed to the ESP32xx device, a hard reset with the RTS pin will be done, and the VSC [Terminal] will show the logging:
 
 ```code
-I (5) boot: ESP-IDF v6.1 2nd stage bootloader
-I (5) boot: compile time Oct  6 2026 21:18:14
-I (6) boot: chip revision: v0.1
+I (24) boot: ESP-IDF v6.1 2nd stage bootloader
+I (24) boot: compile time Oct  7 2026 11:20:06
+I (25) boot: chip revision: v0.4
+I (25) boot: efuse block revision: v1.3
+I (28) boot.esp32c3: SPI Speed      : 80MHz
+I (32) boot.esp32c3: SPI Mode       : DIO
 ...
-I (133) app_init: Application information:
-I (137) app_init: Project name:     ESP-IDF-blink
-I (142) app_init: App version:      1
-I (145) app_init: Compile time:     Oct  6 2026 21:17:59
+I (155) app_init: Application information:
+I (159) app_init: Project name:     ESP-IDF-blink
+I (164) app_init: App version:      1
+I (167) app_init: Compile time:     Oct  7 2026 11:19:52
 ...
-I (224) main_task: Started on CPU0
-I (224) main_task: Calling app_main()
+I (253) main_task: Started on CPU0
+I (253) main_task: Calling app_main()
+I (253) BLINK: Status LED on GPIO=8
 ```
 
-From here, the logging is about the application.
+The last log line comes from the Blink example itself, more logging can follow.
 
 ## Rebuild from scratch
 
-Remove the files and folders that were added after Confufure (see above, paragraph: `Added files after Configure`). No need to remove the `build` folder, this will be done by Fullclean.
+Remove the files and folders that were added after Configure (see above, paragraph: `Added files after Configure`). No need to remove the `build` folder, this will be done by Fullclean.
 
 In short, remove:
 

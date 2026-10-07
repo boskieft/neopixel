@@ -17,11 +17,11 @@ static const char *TAG = "BLINK";
     GPIO pins -> Adapt to your hardware configuration !
 -----------------------------------------------------------
 */
-// My ESP32-C6 config
-static const gpio_num_t statusLedPin = GPIO_NUM_15; // output pin to drive the classic on/off status LED
+// My ESP32-C3 config
+static const gpio_num_t statusLedPin = GPIO_NUM_8; // output pin to drive the classic on/off status LED
 
-static const gpio_num_t enablePin = GPIO_NUM_21; // optional output pin to enable the 74HCT126 level shifter
-static const gpio_num_t dataPin = GPIO_NUM_2;    // output data pin to DI of Neopixel ring (via 74HCT126 level shifter)
+static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enable the 74HCT126 level shifter
+static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of Neopixel ring (via 74HCT126 level shifter)
 
 /*
 -----------------------------------------------------------

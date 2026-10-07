@@ -16,6 +16,9 @@ See instructions in README.md of that folder.
 
 ## Configure, Build, Run
 
-Only now open the `neopixel` folder in VSC.
+Open the `neopixel` folder in VSC.
 
-Next, see the generic instructions in `examples\ESP-IDF\README.md`, and do note that the file structure is somewhat different with the test program in the `dev` folder, and the `examples` folder that is not used now.
+Next, see the generic instructions in `examples\ESP-IDF\README.md` on how the build with ESP-IDF. Do note that:
+
+* The file structure is somewhat different with the test program in the `dev` folder
+* The `examples` folder is not used for the test program.
