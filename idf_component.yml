@@ -1,4 +1,4 @@
-version: "0.5.0"
+version: "0.8.0"
 description: "Neopixel driver for ESP32xx using I2S"
 url: "https://github.com/boskieft/neopixel"
 repository: "https://github.com/boskieft/neopixel.git"
