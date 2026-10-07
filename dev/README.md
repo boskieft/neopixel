@@ -2,7 +2,7 @@
 
 This "neopixel" repository is an ESP-IDF component (aka: library), NOT a standalone ESP-IDF application.
 
-However, the `dev` directory (here) also contains a small ESP-IDF test program, that can be used to compile and run the component on target.
+However, the `dev` directory (here) also contains a small ESP-IDF Test Program, that can be used to compile and run the component on target.
 
 ## Copy/Clone
 
@@ -20,5 +20,5 @@ Open the `neopixel` folder in VSC.
 
 Next, see the generic instructions in `examples\ESP-IDF\README.md` on how the build with ESP-IDF. Do note that:
 
-* The file structure is somewhat different with the test program in the `dev` folder
-* The `examples` folder is not used for the test program.
+* The file structure is somewhat different with the Test Program in the `dev` folder
+* The `examples` folder is not used for the Test Program

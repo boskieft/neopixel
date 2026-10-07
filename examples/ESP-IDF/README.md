@@ -4,7 +4,9 @@ Espressif's ESP-IDF can be used to build and test an ESP-IDF example from this f
 
 ## Software required
 
-Virtual Studio Code (VSC) with the "ESP-IDF" extension version 5.5.5 or higher (here version 6.1.0 was used).
+Virtual Studio Code (VSC) with the "ESP-IDF" extension version 6.1.0
+
+(in fact v5.5.5 or higher should work, but the cmomands and reponses may be a bit different than shown here)
 
 ## Select an ESP-IDF example
 
@@ -14,7 +16,7 @@ VSC -> File -> Open Folder...
 
 * Browse and use [Select folder]
 
-In VSC Explorer, the minimum file structure for an example should look similar to this
+In VSC Explorer, the minimum file structure for an example should look similar to this:
 
 ```text
 ESP-IDF-blink
@@ -34,6 +36,19 @@ Looking into the *.cpp file(s) you may see red squiggles under the #includes, co
 You may also get a VSC popup [Scan for kits] to set the compiler.
 
 You can ignore all this, it will be solved in the next step: Configure.
+
+## Summary of commands
+
+Below and overview of the `ESP-IDF: Explorer` commands to run for an initial build:
+
+* `Set current ESP-IDF version`
+* `Set Espressif Device Target (IDF_TARGET)`, to select the new ESP32xx device
+* `SDK Configuration Editor (menuconfig)`, to enable Debug logging
+* `Build Project`
+* `Select Port to Use (COM, tty, usbserial)`
+* `Build, Flash and Monitor`
+
+Next paragraphs descibe these commands in more detail.
 
 ## Configure
 
@@ -68,6 +83,29 @@ ESP-IDF-blink
 ```
 
 And the file `.vscode\settings.json` is updated to your local build environment.
+
+## Enable Debug logging
+
+By default, only Info messages and above are enabled by EDF-IDF. You can change this to Debug:
+
+VSC, ESP-IDF: Explorer -> `ESP-IDF: SDK Configuration Editor (menuconfig)`
+
+After some setup the `SDK Configuration editor` is opened in a tab.
+
+In the index (left hand side) go to Log -> `Log Level`
+
+On the right hand side change:
+
+Log Level:
+
+* Maximum log verbosity = `Debug`
+* (do NOT change the _default_ verbosity)
+
+Format:
+
+* `[v]` Color
+
+This will make the required (CONFIG_LOG_*) changes in the relevant `sdkconfig` file.
 
 ## Build
 
@@ -118,7 +156,7 @@ In the blue VSC bar on the bottom, the selected COM10 port is shown, next to a p
 
 ESP-IDF: Explorer -> `Build, Flash and Monitor`
 
-The first time, Select Flash Method" is shown on the top the the VSC screen
+The first time, `Select Flash Method` is shown on the top the the VSC screen
 
 * Select `UART`
 * (this will update .vscode/settings.json)
@@ -145,9 +183,19 @@ I (253) BLINK: Status LED on GPIO=8
 
 The last log line comes from the Blink example itself, more logging can follow.
 
+## Switch to another ESP32xx device
+
+To test on another ESP32 Target Device, in `ESP-IDF: Explorer` click on the next commands:
+
+* `Set Espressif Device Target (IDF_TARGET)`, to select the new ESP32xx device
+* `SDK Configuration Editor (menuconfig)`, to enable Debug logging again
+* `Build Project`
+* `Select Port to Use (COM, tty, usbserial)`, because the new device probably uses another COMxx port
+* `Build, Flash and Monitor`
+
 ## Rebuild from scratch
 
-Remove the files and folders that were added after Configure (see above, paragraph: `Added files after Configure`). No need to remove the `build` folder, this will be done by Fullclean.
+Remove the files and folders that were added after Configure (see above, paragraph: `Added files after Configure`).
 
 In short, remove:
 
@@ -157,5 +205,6 @@ In short, remove:
 
 ESP-IDF Explorer -> click on:
 
-* Fullclean
-* Build, Flash and Monitor
+* `Fullclean`, to remove the `build` folder
+* `SDK Configuration Editor (menuconfig)`, to enable Debug logging again
+* `Build, Flash and Monitor`
