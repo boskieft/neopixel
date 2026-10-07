@@ -1,6 +1,6 @@
 /*
 ***********************************************************
-    Blink example
+    Test program, to showcase all major functions
 ***********************************************************
 */
 #include <stdio.h>
@@ -11,14 +11,14 @@
 #include "neopixel.h"
 #include "esp_timer.h"
 
-static const char *TAG = "BLINK";
+static const char *TAG = "MAIN";
 
 /*
 -----------------------------------------------------------
     GPIO pins
 
     Set automatically to the correct pins on my hardware,
-    based on the selected ESP32xx variant
+    based on the selected "Espressif Device Target"
 -----------------------------------------------------------
 */
 #if (CONFIG_IDF_TARGET_ESP32)
@@ -47,7 +47,7 @@ static const gpio_num_t statusLedPin = GPIO_NUM_15; // output pin to drive the c
 static const gpio_num_t enablePin = GPIO_NUM_21; // optional output pin to enable the 74HCT126 level shifter
 static const gpio_num_t dataPin = GPIO_NUM_2;    // output data pin to DI of Neopixel ring (via 74HCT126 level shifter)
 #else
-#error " ESP32xx target device has not been set, or is unknown"
+#error "ESP32xx target device has not been set, or is unknown"
 #endif
 
 /*
@@ -69,7 +69,7 @@ static void toggleStatusLed(void) {
 
 /*
 -----------------------------------------------------------
-    Neopixels
+    Config the Neopixels
 -----------------------------------------------------------
 */
 #if (1 == 1)
@@ -103,6 +103,11 @@ void startNeopixel(void) {
     npx.brightness = 0x10;           // medium brightness
 }
 
+/*
+-----------------------------------------------------------
+    Neopixels animations
+-----------------------------------------------------------
+*/
 bool walkingPixel(PixelColor walkingColor) {
     static int coloredIndex = 0;
     static int blackIndex = ringSize - 1;
