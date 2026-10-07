@@ -29,7 +29,7 @@ static const gpio_num_t dataPin = GPIO_NUM_19;   // output data pin to DI of Neo
 static const gpio_num_t statusLedPin = GPIO_NUM_16; // output pin to drive the classic on/off status LED
 
 static const gpio_num_t enablePin = GPIO_NUM_5; // optional output pin to enable the 74HCT126 level shifter
-static const gpio_num_t dataPin = GPIO_NUM_9    // output data pin to DI of Neopixel ring (via 74HCT126 level shifter)
+static const gpio_num_t dataPin = GPIO_NUM_9;   // output data pin to DI of Neopixel ring (via 74HCT126 level shifter)
 #elif (CONFIG_IDF_TARGET_ESP32S3)
 static const gpio_num_t statusLedPin = GPIO_NUM_12; // output pin to drive the classic on/off status LED
 
