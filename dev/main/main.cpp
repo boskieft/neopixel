@@ -70,12 +70,19 @@ static void toggleStatusLed(void) {
 /*
 -----------------------------------------------------------
     Neopixels
-
-    Using one assemby of 9 rings with GRBW NeoPixels
 -----------------------------------------------------------
 */
+#if (1 == 1)
+// 1 assemby of 9 rings with GRBW NeoPixels
 NeopixelDriver<PixelType::GRBW_SEQ3> npx;
 static const size_t ringSize = (1 + 8 + 12 + 16 + 24 + 32 + 40 + 48 + 60);
+#else
+// 1 ring of 60, 1 ring of 24, 1 assembly of 6 rings
+NeopixelDriver<PixelType::GRB_SEQ3> npx;
+static const size_t ringSize = (60 + 24 + 1 + 8 + 12 + 16 + 24 + 32);
+#endif
+
+static const size_t rotateSteps = ringSize / 4; // number of steps to showcase the rotation
 
 void startNeopixel(void) {
     if (enablePin != GPIO_NUM_NC) {
@@ -127,8 +134,11 @@ bool walkingPixelAllColors(void) {
             walkingColor = neopixelBlue;
             break;
         case 2:
-            walkingColor = neopixelWhite_RGBW;
-            break;
+            if (npx.hasWhite()) {
+                walkingColor = neopixelWhite_RGBW;
+                break;
+            }
+            [[fallthrough]]; // skip White, proceeed with next
         default:
             walkingColor = neopixelRed;
             colorIndex = 0;
@@ -139,30 +149,79 @@ bool walkingPixelAllColors(void) {
     return (false);
 }
 
-void animateNeopixels(int64_t currentMicros) {
+bool rotateLeft(unsigned long currentMillis) {
+    static int steps = rotateSteps;
+    static unsigned long animationTimeoutMillis = 0;
+    if ((long)(currentMillis - animationTimeoutMillis) >= 0) {
+        steps--;
+        if (steps < 0) {
+            steps = rotateSteps; // reset the steps for the next rotation
+            return true;         // indicate that the rotation is complete
+        } else {
+            npx.rotateLeft();
+            npx.show();
+            animationTimeoutMillis = currentMillis + 100; // slow rotation
+        }
+    }
+    return false; // Placeholder return value
+}
+
+bool rotateRight(unsigned long currentMillis) {
+    static int steps = rotateSteps;
+    static unsigned long animationTimeoutMillis = 0;
+    if ((long)(currentMillis - animationTimeoutMillis) >= 0) {
+        steps--;
+        if (steps < 0) {
+            steps = rotateSteps; // reset the steps for the next rotation
+            return true;         // indicate that the rotation is complete
+        } else {
+            npx.rotateRight();
+            npx.show();
+            animationTimeoutMillis = currentMillis + 100; // slow rotation
+        }
+    }
+    return false; // Placeholder return value
+}
+
+void animateNeopixels(unsigned long currentMillis) {
     static int animationStep = 0;
-    static int64_t animationTimeoutMicros = 0;
+    static unsigned long animationTimeoutMillis = 0;
 
     switch (animationStep) {
     case 0:
         if (walkingPixelAllColors()) {
+            if (npx.isRotatable())
+                animationStep++;
+            else
+                animationStep += 3; // skip left and right rotations
+        }
+        break;
+
+    case 1:
+        if (rotateLeft(currentMillis)) {
             animationStep++;
         }
         break;
 
-    case 1: {
+    case 2:
+        if (rotateRight(currentMillis)) {
+            animationStep++;
+        }
+        break;
+
+    case 3: {
         auto oldBrightness = npx.brightness;
         npx.brightness = 0x03; // set very low brightness, because all Neopixels will be lit
         npx.setAllPixels(neopixelBlue);
         npx.show();
         npx.brightness = oldBrightness;
         animationStep++;
-        animationTimeoutMicros = currentMicros + 3000000; // 3 second delay before resetting the animation
+        animationTimeoutMillis = currentMillis + 3000; // 3 second delay to show this
         break;
     }
 
     default:
-        if (currentMicros - animationTimeoutMicros >= 0) {
+        if ((long)(currentMillis - animationTimeoutMillis) >= 0) {
             animationStep = 0; // reset the animation step to loop the animation
         }
         break;
@@ -178,15 +237,16 @@ extern "C" void app_main(void) {
     configureStatusLed();
     startNeopixel();
 
-    int64_t currentMicros = esp_timer_get_time();
-    int64_t toggleTimeoutMicros = currentMicros;
+    unsigned long currentMillis = esp_timer_get_time() / 1000;
+    unsigned long toggleTimeoutMillis = currentMillis;
 
     while (1) {
-        currentMicros = esp_timer_get_time();
-        if (currentMicros - toggleTimeoutMicros >= 0) {
+        currentMillis = esp_timer_get_time() / 1000;
+        if ((long)(currentMillis - toggleTimeoutMillis) >= 0) {
             toggleStatusLed();
-            toggleTimeoutMicros = currentMicros + 100000; // 100 ms
+            toggleTimeoutMillis = currentMillis + 100;
         }
-        animateNeopixels(currentMicros);
+        animateNeopixels(currentMillis);
+        vTaskDelay(1); // to prevent watchdog reset
     }
 }

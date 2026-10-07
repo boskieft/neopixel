@@ -78,6 +78,7 @@ template <PixelType Mode>
 class NeopixelDriver {
   private:
     // Neopixel config
+    size_t colorsPerPixel;  // number of color components per pixel (3 for GRB, 4 for GRBW)
     size_t txBytesPerColor; // number of bytes to be sent per R/G/B/(W) color component, depends on seq3/seq4 timing
     size_t txBytesPerPixel; // number of bytes per Neopixel (all colors)
 
@@ -147,6 +148,10 @@ class NeopixelDriver {
     //-------------------------------------------
     bool begin(const size_t nrPixels, const gpio_num_t dataPin); // in cpp, will allocate buffer
     void setPixel(const size_t index, const PixelColor color);   // in cpp, will set one pixel in buffer
+
+    bool hasWhite(void) const {
+        return (colorsPerPixel == 4);
+    }
 
     void show(void) {
         txControl.startTransmit(buffer, bufferSize);
