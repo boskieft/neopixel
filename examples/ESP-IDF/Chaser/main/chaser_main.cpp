@@ -1,6 +1,9 @@
 /*
 ***********************************************************
-    Blink example
+    Chaser example
+
+    Neopixels chasing animation
+    (lit one by one after each other)
 ***********************************************************
 */
 #include <stdio.h>
@@ -10,7 +13,7 @@
 #include "esp_log.h"
 #include "neopixel.h"
 
-static const char *TAG = "BLINK";
+static const char *TAG = "CHASER";
 
 /*
 -----------------------------------------------------------
@@ -18,35 +21,14 @@ static const char *TAG = "BLINK";
 -----------------------------------------------------------
 */
 // My ESP32-C3 config
-static const gpio_num_t statusLedPin = GPIO_NUM_8; // output pin to drive the classic on/off status LED
-
 static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enable the 74HCT126 level shifter
 static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of Neopixel ring (via 74HCT126 level shifter)
+#define PIXEL_COUNT 24                           // nr of Neopixels to drive
 
-/*
------------------------------------------------------------
-    Classic on/off status LED
------------------------------------------------------------
-*/
-static void configureStatusLed(void) {
-    ESP_LOGI(TAG, "Status LED on GPIO=%d", statusLedPin);
-    gpio_reset_pin(statusLedPin);
-    gpio_set_direction(statusLedPin, GPIO_MODE_OUTPUT);
-}
-
-static void blinkStatusLed(bool isOn) {
-    gpio_set_level(statusLedPin, !isOn); // LED is active low
-}
-
-/*
------------------------------------------------------------
-    Neopixel LED
------------------------------------------------------------
-*/
 NeopixelDriver<PixelType::GRB_SEQ3> npx;
-#define PIXEL_COUNT 1
 
 void startNeopixel(void) {
+    // Optional: Enable the level shifter
     if (enablePin != GPIO_NUM_NC) {
         ESP_LOGI(TAG, "Switching On enablePin=%d", enablePin);
         gpio_set_direction(enablePin, GPIO_MODE_OUTPUT);
@@ -55,23 +37,31 @@ void startNeopixel(void) {
         ESP_LOGI(TAG, "Optional enablePin is NOT configured");
     }
 
-    // Increase logging of the Neopixel driver and I2S subsystem
+    // Optional: Increase logging of the Neopixel driver and its I2S subsystem
     esp_log_level_set("NPIX", ESP_LOG_DEBUG);
     esp_log_level_set("I2S_", ESP_LOG_DEBUG);
 
-    npx.begin(1, dataPin);           // just one (1) pixel for this example
+    // Start the Neopixel driver
+    ESP_LOGI(TAG, "Starting the Neopixel driver on pin=%d with %d pixels", dataPin, PIXEL_COUNT);
+    npx.begin(PIXEL_COUNT, dataPin);
     npx.setAllPixels(neopixelBlack); // set all pixels to black
     npx.show();                      // send the data to the Neopixel ring
     npx.brightness = 0x10;           // medium brightness
 }
 
-void blinkNeopixel(bool isOn) {
-    if (isOn) {
-        npx.setPixel(0, neopixelRed);
-    } else {
-        npx.setPixel(0, neopixelBlack);
-    }
+void chaserAnimation(void) {
+    static int coloredIndex = 0;
+    static int blackIndex = PIXEL_COUNT - 1;
+
+    npx.setPixel(blackIndex, neopixelBlack); // erase previously colored pixel
+    npx.setPixel(coloredIndex, neopixelRed); // set new colored pixel
     npx.show();
+
+    // Update the pixel indexes for the next iteration
+    blackIndex = coloredIndex;
+    if (++coloredIndex >= PIXEL_COUNT) {
+        coloredIndex = 0; // new loop
+    }
 }
 
 /*
@@ -80,17 +70,13 @@ void blinkNeopixel(bool isOn) {
 ***********************************************************
  */
 extern "C" void app_main(void) {
-    configureStatusLed();
+    vTaskDelay(3000 / portTICK_PERIOD_MS); // allow Terminal to connect
     startNeopixel();
 
-    bool isOn = true;
+    ESP_LOGI(TAG, "Start the Chaser animation");
 
     while (1) {
-        blinkStatusLed(isOn);
-        blinkNeopixel(isOn);
-
-        /* Toggle the LED state */
-        isOn = !isOn;
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        chaserAnimation();
+        vTaskDelay(10 / portTICK_PERIOD_MS); // delay for visibility
     }
 }

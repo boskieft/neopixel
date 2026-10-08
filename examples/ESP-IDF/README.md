@@ -6,7 +6,7 @@ Espressif's ESP-IDF can be used to build and test an ESP-IDF example from this f
 
 Virtual Studio Code (VSC) with the "ESP-IDF" extension version 6.1.0
 
-(in fact v5.5.5 or higher should work, but the cmomands and reponses may be a bit different than shown here)
+(in fact ESP-IDF v5.5.5 or higher should work, but the cmomands and reponses may be a bit different than shown here)
 
 ## Select an ESP-IDF example
 
@@ -21,7 +21,7 @@ In VSC Explorer, the minimum file structure for an example should look similar t
 ```text
 ESP-IDF-blink
 >-- main
-|    |-- blink_example_main.cpp
+|    |-- blink_main.cpp
 |    |-- CMakeLists.txt
 |    |-- idf_component.yml
 |
@@ -41,11 +41,12 @@ You can ignore all this, it will be solved in the next step: Configure.
 
 Below and overview of the `ESP-IDF: Explorer` commands to run for an initial build:
 
-* `Set current ESP-IDF version`
+* `Set current ESP-IDF version` = v6.1.0
+* `Set Flash Method` = UART
 * `Set Espressif Device Target (IDF_TARGET)`, to select the new ESP32xx device
 * `SDK Configuration Editor (menuconfig)`, to enable Debug logging
 * `Build Project`
-* `Select Port to Use (COM, tty, usbserial)`
+* `Select Port to Use (COM, tty, usbserial)` = detect, for automatic detection of the COMxx port
 * `Build, Flash and Monitor`
 
 Next paragraphs descibe these commands in more detail.
@@ -58,6 +59,11 @@ ESP-IDF: Explorer -> `Set current ESP-IDF version`
 
 * Select e.g. `Version: v6.1.0`
 * (this will update .vscode/settings.json)
+
+ESP-IDF: Explorer -> `Set Flash Method`
+
+* Select `UART`
+* (this will also update .vscode/settings.json)
 
 ESP-IDF: Explorer -> `Set Espressif Device Target (IDF_TARGET)`
 
@@ -84,7 +90,7 @@ ESP-IDF-blink
 
 And the file `.vscode\settings.json` is updated to your local build environment.
 
-## Enable Debug logging
+## Optional: Enable Debug logging
 
 By default, only Info messages and above are enabled by EDF-IDF. You can change this to Debug:
 
@@ -156,34 +162,47 @@ In the blue VSC bar on the bottom, the selected COM10 port is shown, next to a p
 
 ESP-IDF: Explorer -> `Build, Flash and Monitor`
 
-The first time, `Select Flash Method` is shown on the top the the VSC screen
-
-* Select `UART`
-* (this will update .vscode/settings.json)
-
 The software will be flashed to the ESP32xx device, a hard reset with the RTS pin will be done, and the VSC [Terminal] will show the logging:
 
 ```code
+...
 I (24) boot: ESP-IDF v6.1 2nd stage bootloader
-I (24) boot: compile time Oct  7 2026 11:20:06
+I (24) boot: compile time Oct  8 2026 23:20:30
 I (25) boot: chip revision: v0.4
 I (25) boot: efuse block revision: v1.3
 I (28) boot.esp32c3: SPI Speed      : 80MHz
 I (32) boot.esp32c3: SPI Mode       : DIO
 ...
-I (155) app_init: Application information:
-I (159) app_init: Project name:     ESP-IDF-blink
-I (164) app_init: App version:      1
-I (167) app_init: Compile time:     Oct  7 2026 11:19:52
+I (145) cpu_start: Unicore app
+I (153) cpu_start: GPIO 20 and 21 are used as console UART I/O pins
+I (154) cpu_start: Pro cpu start user code
+I (154) cpu_start: cpu freq: 160000000 Hz
+I (158) app_init: Application information:
+I (163) app_init: Project name:     ESP-IDF-blink
+I (168) app_init: App version:      1
+I (173) app_init: Compile time:     Oct  8 2026 23:20:17
 ...
-I (253) main_task: Started on CPU0
-I (253) main_task: Calling app_main()
-I (253) BLINK: Status LED on GPIO=8
+I (274) main_task: Started on CPU0
+I (274) main_task: Calling app_main()
+I (3274) BLINK: Status LED on GPIO=8
+I (3274) BLINK: Switching On enablePin=10
+I (3274) BLINK: Starting the Neopixel driver on pin=5 with 1 pixels
+D (3274) NPIX: GRB Neopixels, seq3 timing
+D (3274) I2S_: Big-Endian buffer
+D (3284) I2S_: Raw data size=9 bytes, bitRate=2400000 bps
+D (3284) I2S_: Optimised buffer size=32 bytes, frames/chunk=8, bytes/frame=4, DMA chunks=2
+D (3294) I2S_: Sample rate=75000 frames/sec
+D (3304) I2S_: Interrupt priority=0
+I (3304) I2S_: Started I2S channel=0, internal DMA buffer size=64 bytes, required transmit time=213 us
+D (3314) I2S_: Starting separate Task for Transmit Control on core=0, priority=2
+D (3324) I2S_: maxSendMicros=195
+I (3324) BLINK: Start the Blink animation
+
 ```
 
 The last log line comes from the Blink example itself, more logging can follow.
 
-## Switch to another ESP32xx device
+## Optional: Switch to another ESP32xx device
 
 To test on another ESP32 Target Device, in `ESP-IDF: Explorer` click on the next commands:
 
@@ -193,7 +212,7 @@ To test on another ESP32 Target Device, in `ESP-IDF: Explorer` click on the next
 * `Select Port to Use (COM, tty, usbserial)`, because the new device probably uses another COMxx port
 * `Build, Flash and Monitor`
 
-## Rebuild from scratch
+## Optional: Rebuild from scratch
 
 Remove the files and folders that were added after Configure (see above, paragraph: `Added files after Configure`).
 

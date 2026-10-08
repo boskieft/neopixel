@@ -1,6 +1,5 @@
 idf_component_register(
-    SRCS "blink_main.cpp"
+    SRCS "chaser_main.cpp"
     INCLUDE_DIRS "."
     REQUIRES neopixel esp_driver_gpio
 )
-
