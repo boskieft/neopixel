@@ -22,7 +22,7 @@ static const char *TAG = "CHASER";
 */
 // My ESP32-C3 config
 static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enable the 74HCT126 level shifter
-static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of Neopixel ring (via 74HCT126 level shifter)
+static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of the Neopixels (via 74HCT126 level shifter)
 #define PIXEL_COUNT 24                           // nr of Neopixels to drive
 
 NeopixelDriver<PixelType::GRB_SEQ3> npx;
@@ -45,7 +45,7 @@ void startNeopixel(void) {
     ESP_LOGI(TAG, "Starting the Neopixel driver on pin=%d with %d pixels", dataPin, PIXEL_COUNT);
     npx.begin(PIXEL_COUNT, dataPin);
     npx.setAllPixels(neopixelBlack); // set all pixels to black
-    npx.show();                      // send the data to the Neopixel ring
+    npx.show();                      // send the data to the Neopixels
     npx.brightness = 0x10;           // medium brightness
 }
 

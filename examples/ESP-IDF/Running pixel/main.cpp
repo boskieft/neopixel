@@ -77,26 +77,26 @@ bool setGPIO(void) {
 
 /*
 -------------------------------------------------------------------------------
-    Start the Neopixel ring
+    Start the Neopixel driver
 -------------------------------------------------------------------------------
 */
-bool startNeopixelRing(void) {
+bool startNeopixelDriver(void) {
     if (!setGPIO()) {
         return (false);
     }
 
-    ESP_LOGI(TAG, "Initializing Neopixel ring on pin=%d with %d pixels", dataPin, PIXEL_COUNT);
+    ESP_LOGI(TAG, "Init the Neopixels on pin=%d with %d pixels", dataPin, PIXEL_COUNT);
     npx.begin(PIXEL_COUNT, dataPin);
     //@@@TODO: error handling
 
     if (npx.isRotatable()) {
-        ESP_LOGI(TAG, "Neopixel ring is rotatable");
+        ESP_LOGI(TAG, "Neopixels are rotatable");
     } else {
-        ESP_LOGI(TAG, "Neopixel ring is NOT rotatable");
+        ESP_LOGI(TAG, "Neopixels are NOT rotatable");
     }
 
     npx.setAllPixels(neopixelBlack); // set all pixels to black
-    npx.show();                      // send the data to the Neopixel ring
+    npx.show();                      // send the data to the Neopixels
     npx.brightness = 0x10;           // medium brightness
     return (true);
 }
@@ -115,7 +115,7 @@ void showMemoryInfo(void) {
 
 /*
 -------------------------------------------------------------------------------
-    Animate a moving pixel on the Neopixel ring
+    Animate a moving pixel on the Neopixels
 -------------------------------------------------------------------------------
 */
 void movingPixel(void) {
@@ -146,7 +146,7 @@ extern "C" void app_main(void) {
     esp_log_level_set("*", ESP_LOG_DEBUG); // Set log level to include ESP_LOGD messages
     ESP_LOGI(TAG, "Starting application...");
     showMemoryInfo();
-    startNeopixelRing();
+    startNeopixelDriver();
     showMemoryInfo();
 
     for (;;) {
@@ -158,7 +158,7 @@ extern "C" void app_main(void) {
 
         for (int i = 0; i < 20; i++) {
             npx.rotateLeft();
-            npx.show();                           // send the rotated data to the Neopixel ring
+            npx.show();                           // send the rotated data to the Neopixels
             vTaskDelay(100 / portTICK_PERIOD_MS); // delay for 100 milliseconds between each rotation
         }
 
@@ -166,7 +166,7 @@ extern "C" void app_main(void) {
 
         for (int i = 0; i < 20; i++) {
             npx.rotateRight();
-            npx.show();                           // send the rotated data to the Neopixel ring
+            npx.show();                           // send the rotated data to the Neopixels
             vTaskDelay(100 / portTICK_PERIOD_MS); // delay for 100 milliseconds between each rotation
         }
 

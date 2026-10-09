@@ -23,7 +23,7 @@ static const char *TAG = "BLINK";
 static const gpio_num_t statusLedPin = GPIO_NUM_8; // output pin to drive the classic on/off Status LED
 
 static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enable the 74HCT126 level shifter
-static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of Neopixel ring (via 74HCT126 level shifter)
+static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of the Neopixels (via 74HCT126 level shifter)
 
 /*
 -----------------------------------------------------------
@@ -66,7 +66,7 @@ void startNeopixel(void) {
     ESP_LOGI(TAG, "Starting the Neopixel driver on pin=%d with %d pixels", dataPin, PIXEL_COUNT);
     npx.begin(PIXEL_COUNT, dataPin);
     npx.setAllPixels(neopixelBlack); // set all pixels to black
-    npx.show();                      // send the data to the Neopixel ring
+    npx.show();                      // send the data to the Neopixels
     npx.brightness = 0x10;           // medium brightness
 }
 
