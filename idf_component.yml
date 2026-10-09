@@ -1,4 +1,4 @@
-version: "0.8.0"
+version: "0.8.2"
 description: "Neopixel driver for ESP32xx using I2S"
 url: "https://github.com/boskieft/neopixel"
 repository: "https://github.com/boskieft/neopixel.git"
@@ -7,12 +7,11 @@ dependencies:
   idf: ">=5.5.5"
 tags:
   - neopixel
-  - led
-  - ws2812b
-  - ws2812
-  - sk6812b
-  - sk6812
   - esp32xx
   - i2s
   - dma
+  - ws2812b
+  - sk6812b
+  - GRB
+  - GRBW
   
