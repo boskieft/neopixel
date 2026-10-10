@@ -49,7 +49,7 @@ static void blinkStatusLed(bool isOn) {
 -----------------------------------------------------------
 */
 NeopixelDriver<PixelType::GRB_SEQ3> npx;
-#define PIXEL_COUNT 1 // just one (1) pixel for this example
+static const size_t nrNeopixels = 1; // just one (1) pixel for this example
 
 void startNeopixel(void) {
     // Optional: Enable the level shifter
@@ -66,8 +66,8 @@ void startNeopixel(void) {
     esp_log_level_set("I2S_", ESP_LOG_DEBUG);
 
     // Start the Neopixel driver
-    ESP_LOGI(TAG, "Starting the Neopixel driver on pin=%d with %d pixels", dataPin, PIXEL_COUNT);
-    npx.begin(PIXEL_COUNT, dataPin);
+    ESP_LOGI(TAG, "Starting the Neopixel driver on pin=%d with %d pixels", dataPin, nrNeopixels);
+    npx.begin(nrNeopixels, dataPin);
     npx.setAllPixels(neopixelBlack); // set all pixels to black
     npx.show();                      // send the data to the Neopixels
     npx.brightness = 0x10;           // medium brightness

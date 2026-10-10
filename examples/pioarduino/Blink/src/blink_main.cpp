@@ -26,20 +26,17 @@ static const gpio_num_t statusLedPin = GPIO_NUM_8; // optional output pin to dri
     Start the Neopixel driver and the Status LED
 ===============================================================================
 */
-#define PIXEL_COUNT 1 // just one (1) Neopixel to drive
+static const size_t nrNeopixels = 1; // just one (1) Neopixel to drive
 NeopixelDriver<PixelType::GRB_SEQ3> npx;
 
 void setup(void) {
+    // Logging
     esp_log_level_set("*", ESP_LOG_DEBUG); // set log level to include ESP_LOGD messages
-    Serial.begin(115200);                  // for library debug output, and for Platformio monitor
-    Serial.setDebugOutput(true);           // enable debug output to serial, for library debug output
-    delay(5000);                           // wait for Platformio monitor to open
+    delay(3000);                           // wait for Platformio monitor to connect
 
     ESP_LOGI(TAG, "----- Running setup, chip=`%s` -----", CONFIG_IDF_TARGET);
 
-    //---------------------------------
-    //  Optional Status LED
-    //---------------------------------
+    // Optional: GPIO for Status LED output
     if (statusLedPin != GPIO_NUM_NC) {
         ESP_LOGI(TAG, "Using statusLedPin=%d", statusLedPin);
         pinMode(statusLedPin, OUTPUT);
@@ -47,17 +44,16 @@ void setup(void) {
         ESP_LOGW(TAG, "Optional statusLedPin is NOT configured, Status LED will not blink");
     }
 
-    //---------------------------------
-    //  Start Neopixel driver
-    //---------------------------------
+    // GPIO for Data output
     if (dataPin == GPIO_NUM_NC) {
         ESP_LOGE(TAG, "STOPPED: No dataPin configured");
         for (;;) {
             delay(100); // wait indefinitely
         }
     }
-
     ESP_LOGI(TAG, "Using dataPin=%d", dataPin);
+
+    // Optional: set Enable output to High
     if (enablePin != GPIO_NUM_NC) {
         ESP_LOGI(TAG, "Switching On enablePin=%d", enablePin);
         pinMode(enablePin, OUTPUT);
@@ -66,17 +62,22 @@ void setup(void) {
         ESP_LOGI(TAG, "Optional enablePin is NOT configured");
     }
 
-    ESP_LOGI(TAG, "Init the Neopixels on pin=%d with %d pixels", dataPin, PIXEL_COUNT);
-    if (!npx.begin(PIXEL_COUNT, dataPin)) {
+    // Init the driver
+    ESP_LOGI(TAG, "Init the Neopixels on pin=%d with %d pixels", dataPin, nrNeopixels);
+    if (!npx.begin(nrNeopixels, dataPin)) {
         ESP_LOGE(TAG, "STOPPED: init failed");
         for (;;) {
             delay(100); // wait indefinitely
         }
     }
 
+    // Preset the Neopixels
     npx.setAllPixels(neopixelBlack); // set all pixels to black
     npx.show();                      // send the data to the Neopixels
     npx.brightness = 0x10;           // medium brightness
+
+    // Let's go
+    ESP_LOGI(TAG, "Start the Blink animation");
 }
 
 /*
@@ -85,25 +86,21 @@ void setup(void) {
 *******************************************************************************
  */
 void loop(void) {
-    bool isOn = true;
+    static bool isOn = true;
 
-    ESP_LOGI(TAG, "Start the Blink animation");
+    if (isOn) {
+        npx.setPixel(0, neopixelRed);
 
-    while (1) {
-        if (isOn) {
-            npx.setPixel(0, neopixelRed);
-
-        } else {
-            npx.setPixel(0, neopixelBlack);
-        }
-        npx.show();
-
-        if (statusLedPin != GPIO_NUM_NC) {
-            // Note: depending on the wiring of the Status LED, you may have to swap HIGH and LOW
-            digitalWrite(statusLedPin, (isOn ? HIGH : LOW));
-        } // else: status LED is not configured
-
-        isOn = !isOn; // toggle for next iteration
-        delay(100);   // for visibility, wait [ms] before the next iteration
+    } else {
+        npx.setPixel(0, neopixelBlack);
     }
+    npx.show();
+
+    if (statusLedPin != GPIO_NUM_NC) {
+        // Note: depending on the wiring of the Status LED, you may have to swap HIGH and LOW
+        digitalWrite(statusLedPin, (isOn ? HIGH : LOW));
+    } // else: status LED is not configured
+
+    isOn = !isOn; // toggle for next iteration
+    delay(100);   // for visibility, wait [ms] before the next iteration
 }

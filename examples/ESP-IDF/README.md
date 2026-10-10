@@ -39,11 +39,15 @@ You may also get a VSC popup [Scan for kits] to set the compiler.
 
 You can ignore all this, it will be solved in the next step: Configure.
 
+## NOTE on waiting!
+
+Do WAIT until the message `Waiting for ESD-IDF to setup CMake...` has disapperared from the VSC blue bottom row.
+
+Also do WAIT for **FULL COMPLETION** of the upcoming `ESP-IDF: Explorer` commands, before starting a new one!
+
 ## Summary of commands
 
 Below and overview of the `ESP-IDF: Explorer` commands to run for an initial build.
-
-NOTE: wait for full completion of each command, before starting a new one.
 
 * `Set current ESP-IDF version` = v6.1.0
 * `Set Flash Method` = UART
@@ -170,8 +174,17 @@ The software will be flashed to the ESP32xx device, a hard reset with the RTS pi
 
 ```code
 ...
+--- Warning: GDB cannot open serial ports accessed as COMx
+--- Using \\.\COM10 instead...
+--- esp-idf-monitor 1.9.0 on \\.\COM10 115200
+--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H
+I (101) esp_image: segment 3: paddr=00020020 vaddr=42000020 sizeESP-ROM:esp32c3-api1-20210207
+Build:Feb  7 2021
+rst:0x15 (USB_UART_CHIP_RESET),boot:0xf (SPI_FAST_FLASH_BOOT)
+...
+
 I (24) boot: ESP-IDF v6.1 2nd stage bootloader
-I (24) boot: compile time Oct  8 2026 23:20:30
+I (24) boot: compile time Oct 10 2026 22:43:54
 I (25) boot: chip revision: v0.4
 I (25) boot: efuse block revision: v1.3
 I (28) boot.esp32c3: SPI Speed      : 80MHz
@@ -184,7 +197,9 @@ I (154) cpu_start: cpu freq: 160000000 Hz
 I (158) app_init: Application information:
 I (163) app_init: Project name:     ESP-IDF-blink
 I (168) app_init: App version:      1
-I (173) app_init: Compile time:     Oct  8 2026 23:20:17
+I (173) app_init: Compile time:     Oct 10 2026 22:43:40
+I (179) app_init: ELF file SHA256:  a9b13f017...
+I (184) app_init: ESP-IDF:          v6.1
 ...
 I (274) main_task: Started on CPU0
 I (274) main_task: Calling app_main()
@@ -201,10 +216,9 @@ I (3304) I2S_: Started I2S channel=0, internal DMA buffer size=64 bytes, require
 D (3314) I2S_: Starting separate Task for Transmit Control on core=0, priority=2
 D (3324) I2S_: maxSendMicros=195
 I (3324) BLINK: Start the Blink animation
-
 ```
 
-The last log line comes from the Blink example itself, more logging can follow.
+The `BLINK` log lines comes from the Blink example itself, more logging can follow.
 
 ## Optional: Switch to another ESP32xx device
 

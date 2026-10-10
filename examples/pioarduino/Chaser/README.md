@@ -18,26 +18,26 @@ The VSC Terminal will show detailed Debug logging like this:
 ```code
 ...
 ============ Before Setup End ============
-I (238) ARDUINO: Pin 18 already has type USB_DM (39) with bus 0x3fc90908
-I (238) ARDUINO: Pin 19 already has type USB_DP (40) with bus 0x3fc90908
-I (5242) CHASER: ----- Running setup, chip=`esp32c3` -----
-I (5242) CHASER: Using dataPin=5
-I (5242) CHASER: Switching On enablePin=10
-I (5245) CHASER: Init the Neopixels on pin=5 with 24 pixels
-D (5252) NPIX: GRB Neopixels, seq3 timing
-D (5256) I2S_: Big-Endian buffer
-D (5260) I2S_: Raw data size=216 bytes, bitRate=2400000 bps
-D (5265) I2S_: Optimised buffer size=216 bytes, frames/chunk=54, bytes/frame=4, DMA chunks=2
-D (5274) I2S_: Sample rate=75000 frames/sec
-D (5279) I2S_: Interrupt priority=0
-I (5282) I2S_: Started I2S channel=0, internal DMA buffer size=432 bytes, required transmit time=1440 us
-D (5292) I2S_: Starting separate Task for Transmit Control on core=0, priority=2
-D (5300) I2S_: maxSendMicros=138
+I (3259) CHASER: ----- Running setup, chip=`esp32c3` -----
+I (3259) CHASER: Using dataPin=5
+I (3259) CHASER: Switching On enablePin=10
+I (3263) CHASER: Init the Neopixels on pin=5 with 24 pixels
+D (3269) NPIX: GRB Neopixels, seq3 timing
+D (3273) I2S_: Big-Endian buffer
+D (3276) I2S_: Raw data size=216 bytes, bitRate=2400000 bps
+D (3282) I2S_: Optimised buffer size=216 bytes, frames/chunk=54, bytes/frame=4, DMA chunks=2
+D (3290) I2S_: Sample rate=75000 frames/sec
+D (3295) I2S_: Interrupt priority=0
+I (3298) I2S_: Started I2S channel=0, internal DMA buffer size=432 bytes, required transmit time=1440 us
+D (3308) I2S_: Starting separate Task for Transmit Control on core=0, priority=2
+D (3316) I2S_: maxSendMicros=133
+I (3319) CHASER: Start the Chaser animation
 =========== After Setup Start ============
 INTERNAL Memory Info:
   ...
 GPIO Info:
   ...
 ============ After Setup End =============
-I (5331) CHASER: Start the Chaser animation
 ```
+
+NOTE: _(no further logging from the example code)_

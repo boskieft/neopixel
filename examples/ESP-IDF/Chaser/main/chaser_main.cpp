@@ -25,7 +25,7 @@ static const char *TAG = "CHASER"; // for ESP_LOGx() logging
 // My ESP32-C3 config
 static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enable the 74HCT126 level shifter
 static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of the Neopixels (via 74HCT126 level shifter)
-#define PIXEL_COUNT 24                           // nr of Neopixels to drive
+static const size_t nrNeopixels = 24;            // nr of Neopixels to drive
 
 NeopixelDriver<PixelType::GRB_SEQ3> npx;
 
@@ -44,8 +44,8 @@ void startNeopixel(void) {
     esp_log_level_set("I2S_", ESP_LOG_DEBUG);
 
     // Start the Neopixel driver
-    ESP_LOGI(TAG, "Starting the Neopixel driver on pin=%d with %d pixels", dataPin, PIXEL_COUNT);
-    npx.begin(PIXEL_COUNT, dataPin);
+    ESP_LOGI(TAG, "Starting the Neopixel driver on pin=%d with %d pixels", dataPin, nrNeopixels);
+    npx.begin(nrNeopixels, dataPin);
     npx.setAllPixels(neopixelBlack); // set all pixels to black
     npx.show();                      // send the data to the Neopixels
     npx.brightness = 0x10;           // medium brightness
@@ -53,7 +53,7 @@ void startNeopixel(void) {
 
 void chaserAnimation(void) {
     static int coloredIndex = 0;
-    static int blackIndex = PIXEL_COUNT - 1;
+    static int blackIndex = nrNeopixels - 1;
 
     npx.setPixel(blackIndex, neopixelBlack); // erase previously colored pixel
     npx.setPixel(coloredIndex, neopixelRed); // set new colored pixel
@@ -61,7 +61,7 @@ void chaserAnimation(void) {
 
     // Update the pixel indexes for the next iteration
     blackIndex = coloredIndex;
-    if (++coloredIndex >= PIXEL_COUNT) {
+    if (++coloredIndex >= nrNeopixels) {
         coloredIndex = 0; // new loop
     }
 }
