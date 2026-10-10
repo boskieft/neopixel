@@ -1,6 +1,7 @@
 # Neopixel Blink Example
 
 This Example demonstrates how to blink both the Status LED (on standard GPIO) and one Neopixel at the same time.
+Build and run in the `ESP-IDF` environment.
 
 ## Change the GPIO numbers
 

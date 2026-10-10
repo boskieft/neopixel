@@ -1,6 +1,7 @@
 # Neopixel Chaser Example
 
 This Example demonstrates the chaser effect: Neopixels are lit one after each other.
+Build and run in the `Pioarduino` environment.
 
 ## Change the GPIO numbers
 

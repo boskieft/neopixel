@@ -2,7 +2,7 @@
 
 The Platformio variant `pioarduio` can be used to build and test an example from this folder.
 
-NOTE: the original Platformio cannot be used with Arduino anymore, because Platformio ceased their support years ago. The old version is still available, but does not work with recent ESP-IDF v5 and up.
+NOTE: the original `Platformio` cannot be used with Arduino anymore, because Platformio ceased their support years ago. The old version is still available, but does not work with recent ESP-IDF v5 and up (v5.5.5 is required for the neopixel driver).
 
 ## Software required
 
@@ -18,12 +18,7 @@ Copy/Clone the from an example (e.g. examples\pioarduino\Chaser) the next folder
 * file: examples\pioarduino\set_gpio.h -> \<YourPath\>\pio-chaser\src
 * file: examples\pioarduino\platformio.ini -> \<YourPath\>\pio-chaser
 
-VSC -> File -> Open Folder...
-
-* Browse and use [Select folder]
-
-In VSC Explorer, the minimum file structure for an example should look similar to this:
-
+The minimal file structure looks like this:
 ```text
 pio-chaser
 |-- src
@@ -33,15 +28,43 @@ pio-chaser
 |-- platformio.ini
 ```
 
+## Open the example in VSC
+
+VSC -> File -> Open Folder...
+
+* Browse and use [Select folder]
+
+Once opened, pioarduino will start setting up the environment automatically.
+After  a short while, the file structure is expanded to this:
+
+```text
+pio-chaser
+|-- .pio
+|    |-- build
+|    |-- libdeps
+|
+|-- .vscode
+|    |-- *.json
+|
+|-- src
+|    |-- chaser_main.cpp
+|    |-- set_gpio.h   (optional)
+|
+|-- .gitignore
+|-- platformio.ini
+```
+
 ## EPS32xx variants, GPIO numbers
 
-In `Platformio.ini` my (Eriks) ESP32xx variants and their boards are defined. You can change this to your needs. Make sure the [env:esp32xx] lowercase names match with the CONFIG_IDF_TARGET_ESP32xx uppercase names in `set_gpio.h`.
+In the file `platformio.ini` my (Eriks) ESP32xx variants and their boards are defined. You can change this to your needs. Make sure the [env:esp32xx] lowercase names match with the CONFIG_IDF_TARGET_ESP32xx uppercase names in `set_gpio.h`.
 
-The file `set_gpio.h` sets the correct GPIO pin numbers, based on the selected esp32xx chip in VSC, pioarduino -> Project Tasks. This is especially convenient when working with multiple ESP32xx variants.
+The file `set_gpio.h` sets the correct GPIO pin numbers, based on the selected esp32xx chip in VSC, pioarduino -> Project Tasks (see Build paragraph below). This is especially convenient when working with multiple ESP32xx variants.
 
-NOTE: the GPIO pin(s) fully depend on the used ESP32xx chip and the hardware circuit around it. Most probably you have to change it to your situation. You can do this in `set_gpio.h`, or directly in the example *.cpp file (and comment-out the #include of `set_gpio.h`).
+NOTE: the GPIO pin(s) are fully depend on the used ESP32xx chip and the hardware circuit around it. Most probably you have to change it to your situation. You can do this in `set_gpio.h`, or directly in the example *.cpp file (and comment-out the #include of `set_gpio.h`):
 
-The `enablePin` is only needed in case your (74HCT126) level shifter has an Enable input, that needs to be driven by your ESP32xx chip. In case you do NOT have it, set `enablePin = GPIO_NUM_NC`.
+* `dataPin` is mandatory, it is the output data pin towards the digital Inpit (DI) of the Neopixels (possibly via 74HCT126 level shifter).
+* `enablePin` is only needed in case your (74HCT126) level shifter has an Enable input, that needs to be driven by your ESP32xx chip. Otherwise set `enablePin = GPIO_NUM_NC`.
+* `statusLedPin` is also optional, it can be used for example in the Blink example to drive the classic on/off Status LED as well. If you don't need it, set `statusLedPin = GPIO_NUM_NC`.
 
 ## pioarduino version
 
@@ -49,11 +72,11 @@ The used pioarduino version is fixed in `platformio.ini`, for example:
 
 ```platform = https://github.com/pioarduino/platform-espressif32/releases/download/55.03.311/platform-espressif32.zip```
 
-This version uses Arduino v3.3.11 based on ESP-IDFv5.5.5.
+As you can guess by the numbers above, this version uses Arduino v3.3.11 based on ESP-IDFv5.5.5.
 
 Pioarduino is updated on a regular base, see: <https://github.com/pioarduino/platform-espressif32/releases>
 
-You can use a newer `pioarduino` version by updating the above line in `Platformio.ini`
+You can use a newer `pioarduino` version by updating the above line in `Platformio.ini`.
 
 ## NOTE on red squiggles and warnings
 
@@ -72,7 +95,11 @@ Pioarduino -> `Project Tasks`
 * Select your ESP32xx configuration, e.g. `esp32c3`
 * (NOTE: as stated before, the ESP32xx variants are defined in Platformio.ini as `[env:esp32xx]`)
 
+The first time you click on `esp32xx`, pioarduino will setup the environment for that ESP32xx and close the folder you just opened. Once pioarduino is done (see progress bar on top), open the folder again to build the example.
+
 ... -> `esp32c3`-> General -> Build
+
+The [Terminal] tab will show the build progress:
 
 ```code
 ...
@@ -86,13 +113,14 @@ Dependency Graph
 Building in release mode
 Compiling .pio\build\esp32c3\libd34\neopixel\neopixel.cpp.o
 Compiling .pio\build\esp32c3\libd34\neopixel\neopixel_i2s.cpp.o
-Compiling .pio\build\esp32c3\src\main.cpp.o
+Compiling .pio\build\esp32c3\src\chaser_main.cpp.o
 Building .pio\build\esp32c3\bootloader.bin
 ...
 Checking size .pio\build\esp32c3\firmware.elf
 Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
 RAM:   [          ]   4.4% (used 14572 bytes from 327680 bytes)
 Flash: [==        ]  24.6% (used 322804 bytes from 1310720 bytes)
+Building .pio\build\esp32c3\firmware.bin
 ...
 Successfully created combined binary image.
 ```
@@ -101,7 +129,7 @@ Successfully created combined binary image.
 
 Pioarduino -> Project Tasks -> `esp32c3` -> General -> `Upload and Monitor`
 
-The required COMxx port will be chosen automatically and the firmware will be flashed.
+The required COMxx port for uploading will be chosen automatically and the firmware will be flashed.
 
 ```code
 Configuring upload protocol...
@@ -148,9 +176,13 @@ Next, VSC will switch automatically to the [ESP Decoder] tab
 
 ## ESP Decoder
 
-This tab shows the ESP32xx logging, first part comes from Arduino, then from your application.
+The first time you need to specify the `Port` for seeing the logs. In the top bar of VSC, select the COMxx that seems to be active (eg "COM10 - Microsoft -- ...").
 
-NOTE: after `Upload and Monitor`, the [ESP Decoder] starts up a bit too slow, causing it to skip the first line. By clicking [Reset] you can start again, and this time you will see everything.
+The tab [ESP Decode] will now show the ESP32xx logging, first part comes from Arduino, then the logs from your application.
+
+NOTE 1: after `Upload and Monitor`, the [ESP Decoder] starts up a bit too slow, causing it to skip the first log lines. By clicking first [Clear] to remove the current logs, and then [Reset] you can start the ESP323xx device again, and this time you will see everything.
+
+NOTE 2: in `platformio.ini` the logging is set to Debug level, you can change it the Info to get rid of most startup logs.
 
 ```code
 ESP-ROM:esp32c3-api1-20210207

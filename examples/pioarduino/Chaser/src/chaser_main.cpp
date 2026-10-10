@@ -1,13 +1,23 @@
+/*
+***************************************************************************************************
+    Example of using the ESP32xx Neopixel Driver on Pioarduino: Chaser animation
+
+    The Neopixels will be lit one after each other
+
+    Copyright (c) 2026 Erik Boskieft. All rights reserved.
+    Released under the MIT License, see the LICENSE file for details.
+***************************************************************************************************
+*/
 #include <Arduino.h>
 #include "set_gpio.h" // comment-out to define the GPIO pins manually below
 #include "neopixel.h"
 
-#define TAG "CHASER"
+static const char *TAG = "CHASER"; // for ESP_LOGx() logging
 
 #ifndef SET_GPIO_H
 // instead of using "set_gpio.h" you can also set the GPIO pins manually here
-static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enable the 74HCT126 level shifter
 static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of the Neopixels (via 74HCT126 level shifter)
+static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enable the 74HCT126 level shifter
 #endif
 
 /*

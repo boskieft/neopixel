@@ -1,10 +1,12 @@
 /*
-***********************************************************
-    Chaser example
+***************************************************************************************************
+    Example of using the ESP32xx Neopixel Driver on ESP-IDF: Chaser animation
 
-    Neopixels chasing animation
-    (lit one by one after each other)
-***********************************************************
+    The Neopixels will be lit one after each other
+
+    Copyright (c) 2026 Erik Boskieft. All rights reserved.
+    Released under the MIT License, see the LICENSE file for details.
+***************************************************************************************************
 */
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
@@ -13,7 +15,7 @@
 #include "esp_log.h"
 #include "neopixel.h"
 
-static const char *TAG = "CHASER";
+static const char *TAG = "CHASER"; // for ESP_LOGx() logging
 
 /*
 -----------------------------------------------------------

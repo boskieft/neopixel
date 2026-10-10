@@ -20,7 +20,10 @@ In VSC Explorer, the minimum file structure for an example should look similar t
 
 ```text
 ESP-IDF-blink
->-- main
+|-- .vscode
+|    |-- c_cpp_properties.json
+|
+|-- main
 |    |-- blink_main.cpp
 |    |-- CMakeLists.txt
 |    |-- idf_component.yml
@@ -39,7 +42,9 @@ You can ignore all this, it will be solved in the next step: Configure.
 
 ## Summary of commands
 
-Below and overview of the `ESP-IDF: Explorer` commands to run for an initial build:
+Below and overview of the `ESP-IDF: Explorer` commands to run for an initial build.
+
+NOTE: wait for full completion of each command, before starting a new one.
 
 * `Set current ESP-IDF version` = v6.1.0
 * `Set Flash Method` = UART

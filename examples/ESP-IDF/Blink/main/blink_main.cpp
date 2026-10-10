@@ -1,9 +1,12 @@
 /*
-***********************************************************
-    Blink example
+***************************************************************************************************
+    Example of using the ESP32xx Neopixel Driver on ESP-IDF: Blink animation
 
-    Neopixel and Status LED both blinking
-***********************************************************
+    Blink both the Status LED (on standard GPIO) and one (1) Neopixel at the same time.
+
+    Copyright (c) 2026 Erik Boskieft. All rights reserved.
+    Released under the MIT License, see the LICENSE file for details.
+***************************************************************************************************
 */
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
@@ -12,7 +15,7 @@
 #include "esp_log.h"
 #include "neopixel.h"
 
-static const char *TAG = "BLINK";
+static const char *TAG = "BLINK"; // for ESP_LOGx() logging
 
 /*
 -----------------------------------------------------------
