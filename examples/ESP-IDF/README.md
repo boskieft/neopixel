@@ -29,7 +29,6 @@ ESP-IDF-blink
 |    |-- idf_component.yml
 |
 |-- CMakeLists.txt
-|-- README.md   (optional)
 ```
 
 ### NOTE on red squiggles and warnings

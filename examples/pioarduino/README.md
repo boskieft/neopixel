@@ -23,7 +23,7 @@ The minimal file structure looks like this:
 pio-chaser
 |-- src
 |    |-- chaser_main.cpp
-|    |-- set_gpio.h   (optional)
+|    |-- set_gpio.h
 |
 |-- platformio.ini
 ```
@@ -48,7 +48,7 @@ pio-chaser
 |
 |-- src
 |    |-- chaser_main.cpp
-|    |-- set_gpio.h   (optional)
+|    |-- set_gpio.h
 |
 |-- .gitignore
 |-- platformio.ini
