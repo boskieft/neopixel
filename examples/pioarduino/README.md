@@ -174,6 +174,15 @@ Hard resetting via RTS pin...
 
 Next, VSC will switch automatically to the [ESP Decoder] tab
 
+## Upload error?
+
+In case you accidently selected the wrong `Project Task -> esp32xx` variant, the firmware cannot be uploaded and you get an error as shown below. Just use the right esp32xx variant instead (`esp32c3` in this case).
+
+```code
+A fatal error occurred: This chip is ESP32-C3, not ESP32-S3. Wrong chip argument?
+*** [upload] Error 2
+```
+
 ## ESP Decoder
 
 The first time you need to specify the `Port` for seeing the logs. In the top bar of VSC, select the COMxx that seems to be active (eg "COM10 - Microsoft -- ...").
