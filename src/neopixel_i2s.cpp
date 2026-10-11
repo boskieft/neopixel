@@ -197,7 +197,7 @@ bool NeopixelTransmitControl::init(
     if (xTaskCreatePinnedToCore(
             transmitTask, // Task function to run
             "NeopixelTX", // Task name in RTOS
-            1000,         // [bytes] stack size, 25sep26: max usage on ESP32=566 bytes, S3=764 (!), C3=320, C6=312
+            1200,         // [bytes] stack size, 11okt26 (Debug logging): max usage on ESP32=566 bytes, S3=1020 (!), C3=488, C6=416
             this,         // Task parameter: reference to this parent class instance
             priority,
             &transmitTaskHandle, // created Task handle
@@ -353,11 +353,12 @@ void NeopixelTransmitControl::startTransmit(
     transmitNoTask();
 #endif
 
+    // Keep track on how long this takes
     endMicros = esp_timer_get_time();
     int64_t deltaMicros = endMicros - startMicros;
     if (deltaMicros > statsPtr->maxSendMicros) {
         statsPtr->maxSendMicros = deltaMicros;
-        ESP_LOGD(TAG, "maxSendMicros=%lld", statsPtr->maxSendMicros); //@@@TODO: remove, show statistics on request
+        ESP_LOGD(TAG, "maxSendMicros=%lld", statsPtr->maxSendMicros);
     }
 }
 

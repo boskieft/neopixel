@@ -1,7 +1,10 @@
 /*
-***********************************************************
-    Test program, to showcase all major functions
-***********************************************************
+*******************************************************************************
+    Test program, to showcase all major functions of the Neopixel driver
+
+    Copyright (c) 2026 Erik Boskieft. All rights reserved.
+    Released under the MIT License, see the LICENSE file for details.
+*******************************************************************************
 */
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
@@ -47,44 +50,28 @@ static const gpio_num_t statusLedPin = GPIO_NUM_15; // output pin to drive the c
 static const gpio_num_t enablePin = GPIO_NUM_21; // optional output pin to enable the 74HCT126 level shifter
 static const gpio_num_t dataPin = GPIO_NUM_2;    // output data pin to DI of Neopixel ring (via 74HCT126 level shifter)
 #else
-#error "ESP32xx target device has not been set, or is unknown"
+#error "ESP32xx target device has not been set, or is unknown here"
 #endif
 
 /*
------------------------------------------------------------
-    Classic on/off Status LED as heartbeat
------------------------------------------------------------
-*/
-static void configureStatusLed(void) {
-    ESP_LOGI(TAG, "Status LED on GPIO=%d", statusLedPin);
-    gpio_reset_pin(statusLedPin);
-    gpio_set_direction(statusLedPin, GPIO_MODE_OUTPUT);
-}
-
-static void toggleStatusLed(void) {
-    static bool isOn = false;
-    gpio_set_level(statusLedPin, isOn);
-    isOn = !isOn;
-}
-
-/*
------------------------------------------------------------
-    Config the Neopixels
------------------------------------------------------------
+===============================================================================
+    Start the Neopixel driver
+===============================================================================
 */
 #if (1 == 1)
 // 1 assemby of 9 rings with GRBW NeoPixels
 NeopixelDriver<PixelType::GRBW_SEQ3> npx;
-static const size_t ringSize = (1 + 8 + 12 + 16 + 24 + 32 + 40 + 48 + 60);
+static const size_t nrNeopixels = (1 + 8 + 12 + 16 + 24 + 32 + 40 + 48 + 60);
 #else
 // 1 ring of 60, 1 ring of 24, 1 assembly of 6 rings
 NeopixelDriver<PixelType::GRB_SEQ3> npx;
-static const size_t ringSize = (60 + 24 + 1 + 8 + 12 + 16 + 24 + 32);
+static const size_t nrNeopixels = (60 + 24 + 1 + 8 + 12 + 16 + 24 + 32);
 #endif
 
-static const size_t rotateSteps = ringSize / 4; // number of steps to showcase the rotation
+static const size_t rotateSteps = nrNeopixels / 4; // number of steps to showcase the rotation
 
-void startNeopixel(void) {
+static void startNeopixel(void) {
+    // Optional: set Enable output to High
     if (enablePin != GPIO_NUM_NC) {
         ESP_LOGI(TAG, "Switching On enablePin=%d", enablePin);
         gpio_set_direction(enablePin, GPIO_MODE_OUTPUT);
@@ -97,28 +84,113 @@ void startNeopixel(void) {
     esp_log_level_set("NPIX", ESP_LOG_DEBUG);
     esp_log_level_set("I2S_", ESP_LOG_DEBUG);
 
-    npx.begin(ringSize, dataPin);    // just one (1) pixel for this example
+    // Init the driver
+    ESP_LOGI(TAG, "Init the Neopixel Driver on dataPin=%d with nrNeopixels=%d", dataPin, nrNeopixels);
+    npx.begin(nrNeopixels, dataPin); // just one (1) pixel for this example
     npx.setAllPixels(neopixelBlack); // set all pixels to black
     npx.show();                      // send the data to the Neopixel ring
     npx.brightness = 0x10;           // medium brightness
 }
 
 /*
------------------------------------------------------------
-    Neopixels animations
------------------------------------------------------------
+===============================================================================
+    Check and log the Neopixel statistics
+===============================================================================
 */
-bool walkingPixel(PixelColor walkingColor) {
-    static int coloredIndex = 0;
-    static int blackIndex = ringSize - 1;
+static void checkStatistics(void) {
 
-    npx.setPixel(blackIndex, neopixelBlack);  // erase previously colored pixel
-    npx.setPixel(coloredIndex, walkingColor); // set new colored pixel
+    //---------------------------------------------------------------------------------------------
+    // Maximum time taken to send data to the Neopixels
+    //
+    // Initially short (approx 200 us)
+    // Will increase when you try to send faster than the Neopixel transmission rate,
+    // because the Driver needs to wait for the previous transmission to complete
+    //---------------------------------------------------------------------------------------------
+    if (esp_log_level_get("I2S_") < ESP_LOG_DEBUG) {
+        // Driver is not logging it, do it here
+        static int loggedMaxSendMicros = 0;
+        if (npx.stats.maxSendMicros > loggedMaxSendMicros) {
+            loggedMaxSendMicros = npx.stats.maxSendMicros;
+            ESP_LOGI(TAG, "maxSendMicros=%d", loggedMaxSendMicros);
+        }
+    } // else: don't log twice
+
+    //---------------------------------------------------------------------------------------------
+    // Used chunks
+    //
+    // Usually same as the configured number of chunks (2 or more)
+    // Will increase on certain ESP32xx variants when sending fast to a small number of Neopixels,
+    // because the Driver may need to send multiple dummy flush chunks until it is done
+    //---------------------------------------------------------------------------------------------
+    static int loggedMaxChunksSent = 0;
+    if (npx.stats.maxNrChunksSent > loggedMaxChunksSent) {
+        loggedMaxChunksSent = npx.stats.maxNrChunksSent;
+        ESP_LOGI(TAG, "maxNrChunksSent=%d", loggedMaxChunksSent);
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Preload data errors
+    //
+    // Never seen this happen in practice
+    //---------------------------------------------------------------------------------------------
+    static int loggedNrPreloadDataErrors = 0;
+    if (npx.stats.nrPreloadDataErrors > loggedNrPreloadDataErrors) {
+        loggedNrPreloadDataErrors = npx.stats.nrPreloadDataErrors;
+        ESP_LOGI(TAG, "nrPreloadDataErrors=%d", loggedNrPreloadDataErrors);
+    }
+    //---------------------------------------------------------------------------------------------
+    // Channel errors
+    //
+    // Never seen this happen in practice
+    //---------------------------------------------------------------------------------------------
+    static int loggedNrChannelErrors = 0;
+    if (npx.stats.nrChannelErrors > loggedNrChannelErrors) {
+        loggedNrChannelErrors = npx.stats.nrChannelErrors;
+        ESP_LOGI(TAG, "nrChannelErrors=%d", loggedNrChannelErrors);
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Timeouts
+    //
+    // Only seen this one happen in case the dataPin was not configured correctly
+    //---------------------------------------------------------------------------------------------
+    static int loggedNrTimeouts = 0;
+    if (npx.stats.nrTimeouts > loggedNrTimeouts) {
+        loggedNrTimeouts = npx.stats.nrTimeouts;
+        ESP_LOGI(TAG, "nrTimeouts=%d", loggedNrTimeouts);
+    }
+
+#if (ENABLE_I2S_TASK_VERSION)
+    //---------------------------------------------------------------------------------------------
+    // Free room in the Task stack
+    //
+    // Should remain at least 100 bytes, ESP32xx will reboot when the stack is exhausted
+    // Depends a lot on the ESP32xx variant, Task on ESP32-S3 uses the most stack
+    //---------------------------------------------------------------------------------------------
+    static UBaseType_t loggedMinFreeTaskStack = UINT_MAX;
+    if (npx.stats.minimumFreeStack < loggedMinFreeTaskStack) {
+        loggedMinFreeTaskStack = npx.stats.minimumFreeStack;
+        ESP_LOGI(TAG, "minimumFreeStack=%u", loggedMinFreeTaskStack);
+    }
+#endif
+}
+
+/*
+===============================================================================
+    Neopixels animations
+===============================================================================
+*/
+static bool chaserAnimation(PixelColor chaserColor) {
+    static int coloredIndex = 0;
+    static int blackIndex = nrNeopixels - 1;
+
+    npx.setPixel(blackIndex, neopixelBlack); // erase previously colored pixel
+    npx.setPixel(coloredIndex, chaserColor); // set new colored pixel
     npx.show();
 
     // Update the pixel indexes for the next iteration
     blackIndex = coloredIndex;
-    if (++coloredIndex >= ringSize) {
+    if (++coloredIndex >= nrNeopixels) {
         // New loop
         coloredIndex = 0;
         return (true); // indicate that a new loop will be started
@@ -126,75 +198,76 @@ bool walkingPixel(PixelColor walkingColor) {
     return (false);
 }
 
-bool walkingPixelAllColors(void) {
+static bool chaserAnimationAllColors(void) {
     static int colorIndex = 0;
-    static PixelColor walkingColor = neopixelRed;
+    static PixelColor chaserColor = neopixelRed;
 
-    if (walkingPixel(walkingColor)) {
+    if (chaserAnimation(chaserColor)) {
         switch (colorIndex++) {
         case 0:
-            walkingColor = neopixelGreen;
+            chaserColor = neopixelGreen;
             break;
         case 1:
-            walkingColor = neopixelBlue;
+            chaserColor = neopixelBlue;
             break;
         case 2:
             if (npx.hasWhite()) {
-                walkingColor = neopixelWhite_RGBW;
+                chaserColor = neopixelWhite_RGBW;
                 break;
             }
             [[fallthrough]]; // skip White, proceeed with next
         default:
-            walkingColor = neopixelRed;
+            chaserColor = neopixelRed;
             colorIndex = 0;
-            return (true); // indicate that a new loop will be started
+            return (true); // indicate that Chaser animation is done
             break;
         }
     }
-    return (false);
+    return (false); // not ready yet
 }
 
-bool rotateLeft(unsigned long currentMillis) {
+static bool rotateLeftAnimation(unsigned long currentMillis) {
     static int steps = rotateSteps;
     static unsigned long animationTimeoutMillis = 0;
     if ((long)(currentMillis - animationTimeoutMillis) >= 0) {
         steps--;
         if (steps < 0) {
             steps = rotateSteps; // reset the steps for the next rotation
-            return true;         // indicate that the rotation is complete
+            return true;         // indicate that Rotate Left animation is done
         } else {
-            npx.rotateLeft();
+            npx.rotateAllLeft();
             npx.show();
             animationTimeoutMillis = currentMillis + 100; // slow rotation
         }
     }
-    return false; // Placeholder return value
+    return false; // not ready yet
 }
 
-bool rotateRight(unsigned long currentMillis) {
+static bool rotateRightAnimation(unsigned long currentMillis) {
     static int steps = rotateSteps;
     static unsigned long animationTimeoutMillis = 0;
     if ((long)(currentMillis - animationTimeoutMillis) >= 0) {
         steps--;
         if (steps < 0) {
             steps = rotateSteps; // reset the steps for the next rotation
-            return true;         // indicate that the rotation is complete
+            return true;         // indicate that  Rotate Right animation is done
         } else {
-            npx.rotateRight();
+            npx.rotateAllRight();
             npx.show();
             animationTimeoutMillis = currentMillis + 100; // slow rotation
         }
     }
-    return false; // Placeholder return value
+    return false; // not ready yet
 }
 
-void animateNeopixels(unsigned long currentMillis) {
+static void animateNeopixels(unsigned long currentMillis) {
     static int animationStep = 0;
     static unsigned long animationTimeoutMillis = 0;
 
     switch (animationStep) {
     case 0:
-        if (walkingPixelAllColors()) {
+        if (chaserAnimationAllColors()) {
+
             if (npx.isRotatable())
                 animationStep++;
             else
@@ -203,18 +276,19 @@ void animateNeopixels(unsigned long currentMillis) {
         break;
 
     case 1:
-        if (rotateLeft(currentMillis)) {
+        if (rotateLeftAnimation(currentMillis)) {
             animationStep++;
         }
         break;
 
     case 2:
-        if (rotateRight(currentMillis)) {
+        if (rotateRightAnimation(currentMillis)) {
             animationStep++;
         }
         break;
 
     case 3: {
+        // All blue
         auto oldBrightness = npx.brightness;
         npx.brightness = 0x03; // set very low brightness, because all Neopixels will be lit
         npx.setAllPixels(neopixelBlue);
@@ -234,11 +308,36 @@ void animateNeopixels(unsigned long currentMillis) {
 }
 
 /*
-***********************************************************
+===============================================================================
+    Classic on/off Status LED as heartbeat
+===============================================================================
+*/
+static void configureStatusLed(void) {
+    if (statusLedPin != GPIO_NUM_NC) {
+        ESP_LOGI(TAG, "Status LED on GPIO=%d", statusLedPin);
+        gpio_reset_pin(statusLedPin);
+        gpio_set_direction(statusLedPin, GPIO_MODE_OUTPUT);
+    } else {
+        ESP_LOGI(TAG, "Optional Status LED is NOT configured");
+    }
+}
+
+static void toggleStatusLed(void) {
+    if (statusLedPin != GPIO_NUM_NC) {
+        static bool isOn = false;
+        gpio_set_level(statusLedPin, isOn);
+        isOn = !isOn;
+    }
+}
+
+/*
+*******************************************************************************
     Main
-***********************************************************
- */
+*******************************************************************************
+*/
 extern "C" void app_main(void) {
+    ESP_LOGI(TAG, "----- Starting application, chip=`%s` -----", CONFIG_IDF_TARGET);
+
     configureStatusLed();
     startNeopixel();
 
@@ -251,6 +350,7 @@ extern "C" void app_main(void) {
             toggleStatusLed();
             toggleTimeoutMillis = currentMillis + 100;
         }
+        checkStatistics();
         animateNeopixels(currentMillis);
         vTaskDelay(1); // to prevent watchdog reset
     }

@@ -165,19 +165,21 @@ class NeopixelDriver {
     }
 
     void setPixelRange(size_t startIndex, size_t endIndex, const PixelColor color) {
-        if (startIndex > endIndex) {
-            // Swap the Start and End if they are in the wrong order
-            auto tmpIndex = startIndex;
-            startIndex = endIndex;
-            endIndex = tmpIndex;
-        }
-
-        // Protect against invalid Start or End
-        if ((startIndex >= nrPixels) || (endIndex >= nrPixels)) {
+        // Protect against invalid indices
+        if (startIndex >= nrPixels || endIndex >= nrPixels) {
             return;
         }
 
-        _fillPixelRange(startIndex, (endIndex - startIndex + 1), color);
+        if (startIndex <= endIndex) {
+            // Fill the normal range (inclusive)
+            _fillPixelRange(startIndex, endIndex - startIndex + 1, color);
+        } else {
+            // Wrap around: first fill from startIndex to the last Neopixel
+            _fillPixelRange(startIndex, nrPixels - startIndex, color);
+
+            // Next fill from the first Neopixel to endIndex (inclusive)
+            _fillPixelRange(0, endIndex + 1, color);
+        }
     }
 
     //-------------------------------------------
@@ -190,7 +192,7 @@ class NeopixelDriver {
         );
     }
 
-    void rotateLeft(void) {
+    void rotateAllLeft(void) {
         if (!isRotatable()) {
             return; // just do nothing
         }
@@ -204,7 +206,7 @@ class NeopixelDriver {
         memcpy(&buffer[(nrPixels - 1) * txBytesPerPixel], copiedBytes, txBytesPerPixel);
     }
 
-    void rotateRight(void) {
+    void rotateAllRight(void) {
         if (!isRotatable()) {
             return; // just do nothing
         }

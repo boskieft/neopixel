@@ -141,7 +141,7 @@ void loop(void) {
         ESP_LOGI(TAG, "Method: just rotate pixels");
         // Effect is still a bit jumpy with 24 Neopixels, fine with 60
         for (size_t i = 0; i < nrNeopixels; i++) {
-            npx.rotateLeft();
+            npx.rotateAllLeft();
             npx.show();
             delay(ROTATE_METHOD_DELAY_MS); // delay for visibility
         }
