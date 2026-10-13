@@ -258,3 +258,230 @@ void NeopixelDriver<Mode>::setPixel(
         set_seq4_color(pixel.color.w, &buffer[offset + (3 * NEOPIXEL_SEQ4_BYTES_PER_COLOR)]);
     } // else: unknown pixel type, should not occur
 }
+
+/*
+---------------------------------------------------------------------------------------------------
+    Private Helper: Set a range of pixels in the buffer to the same color,
+    starting     from startIndex and covering nrPixelsInRange pixels.
+---------------------------------------------------------------------------------------------------
+*/
+template <PixelType Mode>
+void NeopixelDriver<Mode>::_fillPixelRange(size_t startIndex, size_t nrPixelsInRange, const PixelColor color) {
+    // First use setPixel for two (!) pixels,
+    // to avoid issue with odd number of bytesPerPixel and Little-Endian byte order
+    setPixel(startIndex, color);
+    if (nrPixelsInRange > 1) {
+        setPixel(startIndex + 1, color);
+
+        // Next duplicate to fill the rest of the range efficiently
+        size_t copiedBytes = txBytesPerPixel * 2;
+        size_t restBytes = (nrPixelsInRange * txBytesPerPixel) - copiedBytes;
+        auto startBufferRange = &buffer[startIndex * txBytesPerPixel];
+
+        while (restBytes >= copiedBytes) {
+            memcpy(&startBufferRange[copiedBytes], startBufferRange, copiedBytes);
+            restBytes -= copiedBytes;
+            copiedBytes *= 2;
+        }
+
+        // Finally copy any remaining bytes that didn't fit into the doubling loop
+        if (restBytes > 0) {
+            memcpy(&startBufferRange[copiedBytes], startBufferRange, restBytes);
+        }
+    } // else: just one (1) Neopixel in the range
+}
+
+/*
+===================================================================================================
+    Set all pixels in the buffer to the same color
+===================================================================================================
+*/
+template <PixelType Mode>
+void NeopixelDriver<Mode>::setAllPixels(const PixelColor color) {
+    _fillPixelRange(0, nrPixels, color);
+}
+
+/*
+===================================================================================================
+    Set a range of pixels in the buffer to the same color
+
+    startIndex and endIndex are inclusive.
+    If startIndex > endIndex, the range wraps around the buffer.
+===================================================================================================
+*/
+template <PixelType Mode>
+void NeopixelDriver<Mode>::setPixelRange(size_t startIndex, size_t endIndex, const PixelColor color) {
+    // Protect against invalid indices
+    if (startIndex >= nrPixels || endIndex >= nrPixels) {
+        return;
+    }
+
+    if (startIndex <= endIndex) {
+        // Fill the normal range (inclusive)
+        _fillPixelRange(startIndex, endIndex - startIndex + 1, color);
+    } else {
+        // Wrap around: first fill from startIndex to the last Neopixel
+        _fillPixelRange(startIndex, nrPixels - startIndex, color);
+
+        // Next fill from the first Neopixel to endIndex (inclusive)
+        _fillPixelRange(0, endIndex + 1, color);
+    }
+}
+
+/*
+===================================================================================================
+    Rotate all pixels in the buffer
+===================================================================================================
+*/
+template <PixelType Mode>
+void NeopixelDriver<Mode>::rotateAllLeft(void) {
+    if (!isRotatable()) {
+        return; // just do nothing
+    }
+
+    // Remember first
+    uint8_t copiedBytes[txBytesPerPixel]; // Variable Length Array (VLA), not standard C++, but supported by GCC
+    memcpy(copiedBytes, &buffer[0], txBytesPerPixel);
+    // Move rest to left (use memmove to handle overlapping memory)
+    memmove(&buffer[0], &buffer[txBytesPerPixel], txBytesPerPixel * (nrPixels - 1));
+    // Put first at the end
+    memcpy(&buffer[(nrPixels - 1) * txBytesPerPixel], copiedBytes, txBytesPerPixel);
+}
+
+template <PixelType Mode>
+void NeopixelDriver<Mode>::rotateAllRight(void) {
+    if (!isRotatable()) {
+        return; // just do nothing
+    }
+
+    // Remember last
+    uint8_t copiedBytes[txBytesPerPixel]; // Variable Length Array (VLA), not standard C++, but supported by GCC
+    memcpy(copiedBytes, &buffer[(nrPixels - 1) * txBytesPerPixel], txBytesPerPixel);
+    // Move rest to right (use memmove to handle overlapping memory)
+    memmove(&buffer[txBytesPerPixel], &buffer[0], txBytesPerPixel * (nrPixels - 1));
+    // Put last as first
+    memcpy(&buffer[0], copiedBytes, txBytesPerPixel);
+}
+
+/*
+===================================================================================================
+    Rotate a range of pixels in the buffer - to the LEFT
+===================================================================================================
+*/
+template <PixelType Mode>
+void NeopixelDriver<Mode>::rotateRangeLeft(size_t startIndex, size_t endIndex) {
+    if (!isRotatable() || nrPixels < 2 ||
+        startIndex >= nrPixels || endIndex >= nrPixels ||
+        startIndex == endIndex) {
+        return;
+    }
+
+    if (startIndex < endIndex) {
+        //-------------------------------------------------------
+        //  Normal range: just rotate Left by one pixel
+        //-------------------------------------------------------
+        // Remember the bytes of pixel[startIndex]
+        uint8_t startPixelBytes[txBytesPerPixel];
+        memcpy(startPixelBytes, &buffer[startIndex * txBytesPerPixel], txBytesPerPixel);
+
+        // Move the range to the Left
+        memmove(&buffer[startIndex * txBytesPerPixel],
+                &buffer[(startIndex + 1) * txBytesPerPixel],
+                (endIndex - startIndex) * txBytesPerPixel);
+
+        // Place the remembered bytes of pixel[startIndex] at pixel[endIndex]
+        memcpy(&buffer[endIndex * txBytesPerPixel], startPixelBytes, txBytesPerPixel);
+    } else {
+        //-------------------------------------------------------
+        //  Range that wraps around the end of the buffer
+        //  Rotate the Far Part and the Near Part independently
+        //-------------------------------------------------------
+        // Remember the bytes of pixel[startIndex], before it gets overwritten by Far Part
+        uint8_t startPixelBytes[txBytesPerPixel];
+        memcpy(startPixelBytes, &buffer[startIndex * txBytesPerPixel], txBytesPerPixel);
+
+        // Remember the bytes of pixel[0], before it gets overwritten by the Near Part
+        uint8_t firstPixelBytes[txBytesPerPixel];
+        memcpy(firstPixelBytes, &buffer[0], txBytesPerPixel);
+
+        // Move the Far Part of the range to the Left
+        if (startIndex < nrPixels - 1) {
+            memmove(&buffer[startIndex * txBytesPerPixel],
+                    &buffer[(startIndex + 1) * txBytesPerPixel],
+                    (nrPixels - startIndex - 1) * txBytesPerPixel);
+        }
+
+        // Move the Near Part of the range to the Left
+        if (endIndex > 0) {
+            memmove(&buffer[0],
+                    &buffer[txBytesPerPixel],
+                    endIndex * txBytesPerPixel);
+        }
+
+        // Place the remembered boundary pixels.
+        memcpy(&buffer[(nrPixels - 1) * txBytesPerPixel], firstPixelBytes, txBytesPerPixel);
+        memcpy(&buffer[endIndex * txBytesPerPixel], startPixelBytes, txBytesPerPixel);
+    }
+}
+
+/*
+===================================================================================================
+    Rotate a range of pixels in the buffer - to the RIGHT
+===================================================================================================
+*/
+template <PixelType Mode>
+void NeopixelDriver<Mode>::rotateRangeRight(size_t startIndex, size_t endIndex) {
+    if (!isRotatable() || nrPixels < 2 ||
+        startIndex >= nrPixels || endIndex >= nrPixels ||
+        startIndex == endIndex) {
+        return;
+    }
+
+    if (startIndex < endIndex) {
+        //-------------------------------------------------------
+        //  Normal range: just rotate Right by one pixel
+        //-------------------------------------------------------
+        // Remember the bytes of pixel[endIndex]
+        uint8_t endPixelBytes[txBytesPerPixel];
+        memcpy(endPixelBytes, &buffer[endIndex * txBytesPerPixel], txBytesPerPixel);
+
+        // Move the range to the Right
+        memmove(&buffer[(startIndex + 1) * txBytesPerPixel],
+                &buffer[startIndex * txBytesPerPixel],
+                (endIndex - startIndex) * txBytesPerPixel);
+
+        // Place the remembered bytes of pixel[endIndex] at pixel[startIndex]
+        memcpy(&buffer[startIndex * txBytesPerPixel], endPixelBytes, txBytesPerPixel);
+    } else {
+        //-------------------------------------------------------
+        //  Range that wraps around the end of the buffer
+        //  Rotate the Far Part and the Near Part independently
+        //-------------------------------------------------------
+        // Remember the bytes of pixel[endIndex]
+        uint8_t endPixelBytes[txBytesPerPixel];
+        memcpy(endPixelBytes, &buffer[endIndex * txBytesPerPixel], txBytesPerPixel);
+
+        if (endIndex > 0) {
+            // Move the Near Part of the range to the right
+            memmove(&buffer[txBytesPerPixel],
+                    &buffer[0],
+                    endIndex * txBytesPerPixel);
+        }
+
+        // Move the last pixel of the buffer to index 0.
+        memcpy(&buffer[0],
+               &buffer[(nrPixels - 1) * txBytesPerPixel],
+               txBytesPerPixel);
+
+        // Move the Far Part of the range to the right
+        if (startIndex < nrPixels - 1) {
+            memmove(&buffer[(startIndex + 1) * txBytesPerPixel],
+                    &buffer[startIndex * txBytesPerPixel],
+                    (nrPixels - startIndex - 1) * txBytesPerPixel);
+        }
+
+        // pixel[startIndex] = remembered pixel[endIndex]
+        memcpy(&buffer[startIndex * txBytesPerPixel], endPixelBytes,
+               txBytesPerPixel);
+    }
+}

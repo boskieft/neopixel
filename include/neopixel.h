@@ -90,31 +90,8 @@ class NeopixelDriver {
     // Transmission tracking
     NeopixelTransmitControl txControl; // class to control Neopixel data transmission, initialized with the stats pointer in the constructor
 
-    // Private method to fill a range of pixels with the specified color
-    void _fillPixelRange(size_t startIndex, size_t nrPixelsInRange, const PixelColor color) {
-        // First use setPixel for two (!) pixels,
-        // to avoid issue with odd number of bytesPerPixel and Little-Endian byte order
-        setPixel(startIndex, color);
-        if (nrPixelsInRange > 1) {
-            setPixel(startIndex + 1, color);
-
-            // Next duplicate to fill the rest of the range efficiently
-            size_t copiedBytes = txBytesPerPixel * 2;
-            size_t restBytes = (nrPixelsInRange * txBytesPerPixel) - copiedBytes;
-            auto startBufferRange = &buffer[startIndex * txBytesPerPixel];
-
-            while (restBytes >= copiedBytes) {
-                memcpy(&startBufferRange[copiedBytes], startBufferRange, copiedBytes);
-                restBytes -= copiedBytes;
-                copiedBytes *= 2;
-            }
-
-            // Finally copy any remaining bytes that didn't fit into the doubling loop
-            if (restBytes > 0) {
-                memcpy(&startBufferRange[copiedBytes], startBufferRange, restBytes);
-            }
-        } // else: just one (1) Neopixel in the range
-    }
+    // Private helper to fill a range of pixels with the specified color
+    void _fillPixelRange(size_t startIndex, size_t nrPixelsInRange, const PixelColor color);
 
   public:
     uint8_t brightness = 255;                     // global brightness (min=0...max=255)
@@ -147,40 +124,21 @@ class NeopixelDriver {
     //  Basic functions
     //-------------------------------------------
     bool begin(const size_t nrPixels, const gpio_num_t dataPin); // in cpp, will allocate buffer
-    void setPixel(const size_t index, const PixelColor color);   // in cpp, will set one pixel in buffer
 
     bool hasWhite(void) const {
         return (colorsPerPixel == 4);
     }
 
     void show(void) {
-        txControl.startTransmit(buffer, bufferSize);
+        txControl.startTransmit(buffer, bufferSize); // transmit the buffer to the Neopixels
     }
 
     //-------------------------------------------
-    //  Set multiple pixels
+    //  Set pixel(s)
     //-------------------------------------------
-    void setAllPixels(const PixelColor color) {
-        _fillPixelRange(0, nrPixels, color);
-    }
-
-    void setPixelRange(size_t startIndex, size_t endIndex, const PixelColor color) {
-        // Protect against invalid indices
-        if (startIndex >= nrPixels || endIndex >= nrPixels) {
-            return;
-        }
-
-        if (startIndex <= endIndex) {
-            // Fill the normal range (inclusive)
-            _fillPixelRange(startIndex, endIndex - startIndex + 1, color);
-        } else {
-            // Wrap around: first fill from startIndex to the last Neopixel
-            _fillPixelRange(startIndex, nrPixels - startIndex, color);
-
-            // Next fill from the first Neopixel to endIndex (inclusive)
-            _fillPixelRange(0, endIndex + 1, color);
-        }
-    }
+    void setPixel(const size_t index, const PixelColor color);
+    void setAllPixels(const PixelColor color);
+    void setPixelRange(size_t startIndex, size_t endIndex, const PixelColor color);
 
     //-------------------------------------------
     //  Rotate pixels
@@ -192,31 +150,9 @@ class NeopixelDriver {
         );
     }
 
-    void rotateAllLeft(void) {
-        if (!isRotatable()) {
-            return; // just do nothing
-        }
+    void rotateAllLeft(void);
+    void rotateAllRight(void);
 
-        // Remember first
-        uint8_t copiedBytes[txBytesPerPixel]; // Variable Length Array (VLA), not standard C++, but supported by GCC
-        memcpy(copiedBytes, &buffer[0], txBytesPerPixel);
-        // Move rest to left (use memmove to handle overlapping memory)
-        memmove(&buffer[0], &buffer[txBytesPerPixel], txBytesPerPixel * (nrPixels - 1));
-        // Put first at the end
-        memcpy(&buffer[(nrPixels - 1) * txBytesPerPixel], copiedBytes, txBytesPerPixel);
-    }
-
-    void rotateAllRight(void) {
-        if (!isRotatable()) {
-            return; // just do nothing
-        }
-
-        // Remember last
-        uint8_t copiedBytes[txBytesPerPixel]; // Variable Length Array (VLA), not standard C++, but supported by GCC
-        memcpy(copiedBytes, &buffer[(nrPixels - 1) * txBytesPerPixel], txBytesPerPixel);
-        // Move rest to right (use memmove to handle overlapping memory)
-        memmove(&buffer[txBytesPerPixel], &buffer[0], txBytesPerPixel * (nrPixels - 1));
-        // Put last as first
-        memcpy(&buffer[0], copiedBytes, txBytesPerPixel);
-    }
+    void rotateRangeLeft(size_t startIndex, size_t endIndex);
+    void rotateRangeRight(size_t startIndex, size_t endIndex);
 };
