@@ -62,10 +62,14 @@ static const gpio_num_t dataPin = GPIO_NUM_2;    // output data pin to DI of Neo
 // 1 assemby of 9 rings with GRBW NeoPixels
 NeopixelDriver<PixelType::GRBW_SEQ3> npx;
 static const size_t nrNeopixels = (1 + 8 + 12 + 16 + 24 + 32 + 40 + 48 + 60);
-#else
+#elif (2 == 0)
 // 1 ring of 60, 1 ring of 24, 1 assembly of 6 rings
 NeopixelDriver<PixelType::GRB_SEQ3> npx;
 static const size_t nrNeopixels = (60 + 24 + 1 + 8 + 12 + 16 + 24 + 32);
+#else
+// 1 ring of 24
+NeopixelDriver<PixelType::GRB_SEQ3> npx;
+static const size_t nrNeopixels = 24;
 #endif
 
 static const size_t rotateSteps = nrNeopixels / 4; // number of steps to showcase the rotation
