@@ -46,8 +46,8 @@ bool NeopixelDriver<Mode>::begin(
         return (false);
     }
 
-    if (!GPIO_IS_VALID_OUTPUT_GPIO(dataPin)) {
-        ESP_LOGE(TAG, "Invalid Neopixel dataPin=%d", static_cast<int>(dataPin));
+    if (dataPin == GPIO_NUM_NC) {
+        ESP_LOGE(TAG, "Neopixel data output pin is NOT configured (dataPin = %d)", dataPin);
         return (false);
     }
 
