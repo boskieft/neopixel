@@ -1,6 +1,6 @@
 # Choosing the right \<PixelType\>
 
-When declaring a Neopixel driver, specify which type to use:
+When declaring a Neopixel Driver, specify which type to use:
 
 - GRB_SEQ3
 - GRB_SEQ4

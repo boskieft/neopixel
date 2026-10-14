@@ -2,7 +2,7 @@
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.22)
 
-# Increase the log level globally (incl components like the Neopixel driver)
+# Increase the log level globally (incl components like the Neopixel Driver)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DLOG_LOCAL_LEVEL=ESP_LOG_DEBUG")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLOG_LOCAL_LEVEL=ESP_LOG_DEBUG")
 

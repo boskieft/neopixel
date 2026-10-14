@@ -48,7 +48,7 @@ NOTE: _(no further logging from the example code)_
 
 ## Rotate method not supported?
 
-The original ESP32 and the ESP32-S2 have an older I2S peripheral that does NOT support `Big-Endian` encoding. This, and the odd number of bytes required for certain PixelTypes (especially `GRB_SEQ3`) causes that the Neopixel driver cannot do in-memory rotation of the pixels. The logging in this example will show that clearly:
+The original ESP32 and the ESP32-S2 have an older I2S peripheral that does NOT support `Big-Endian` encoding. This, and the odd number of bytes required for certain PixelTypes (especially `GRB_SEQ3`) causes that the Neopixel Driver cannot do in-memory rotation of the pixels. The logging in this example will show that clearly:
 
 ```code
 ...

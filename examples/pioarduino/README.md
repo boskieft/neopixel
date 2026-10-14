@@ -2,7 +2,7 @@
 
 The Platformio variant `pioarduio` can be used to build and test an example from this folder.
 
-NOTE: the original `Platformio` cannot be used with Arduino anymore, because Platformio ceased their support years ago. The old version is still available, but does not work with recent ESP-IDF v5 and up (v5.5.5 is required for the neopixel driver).
+NOTE: the original `Platformio` cannot be used with Arduino anymore, because Platformio ceased their support years ago. The old version is still available, but does not work with recent ESP-IDF v5 and up (v5.5.5 is required for the Neopixel Driver).
 
 ## Software required
 
