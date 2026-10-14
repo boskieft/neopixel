@@ -23,7 +23,7 @@ static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enabl
 
 /*
 ===============================================================================
-    Start the Neopixel driver
+    Start the Neopixel Driver
 ===============================================================================
 */
 static const size_t nrNeopixels = 24; // nr of Neopixels to drive
@@ -31,19 +31,10 @@ NeopixelDriver<PixelType::GRB_SEQ3> npx;
 
 void setup(void) {
     // Logging
-    esp_log_level_set("*", ESP_LOG_DEBUG); // set log level to include ESP_LOGD messages
+    esp_log_level_set("*", ESP_LOG_DEBUG); // enable ESP_LOGD debug messages
     delay(3000);                           // wait for Platformio monitor to connect
 
     ESP_LOGI(TAG, "----- Running setup, chip=`%s` -----", CONFIG_IDF_TARGET);
-
-    // GPIO for Data output
-    if (dataPin == GPIO_NUM_NC) {
-        ESP_LOGE(TAG, "STOPPED: No dataPin configured");
-        for (;;) {
-            delay(100); // wait indefinitely
-        }
-    }
-    ESP_LOGI(TAG, "Using dataPin=%d", dataPin);
 
     // Optional: set Enable output to High
     if (enablePin != GPIO_NUM_NC) {
@@ -51,15 +42,14 @@ void setup(void) {
         pinMode(enablePin, OUTPUT);
         digitalWrite(enablePin, HIGH);
     } else {
-        ESP_LOGI(TAG, "Optional enablePin is NOT configured");
+        ESP_LOGI(TAG, "Optional enablePin is NOT configured (pin = %d)", enablePin);
     }
 
-    // Init the driver
-    ESP_LOGI(TAG, "Init the Neopixels on pin=%d with %d pixels", dataPin, nrNeopixels);
+    // Start the Neopixel Driver
     if (!npx.begin(nrNeopixels, dataPin)) {
-        ESP_LOGE(TAG, "STOPPED: init failed");
+        ESP_LOGE(TAG, "STOPPED: Failed to start the Neopixel Driver");
         for (;;) {
-            delay(100); // wait indefinitely
+            delay(100);
         }
     }
 

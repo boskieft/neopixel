@@ -27,7 +27,7 @@ static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enabl
 
 /*
 ===============================================================================
-    Start the Neopixel driver
+    Start the Neopixel Driver
 ===============================================================================
 */
 static const size_t nrNeopixels = 24; // nr of Neopixels to drive
@@ -35,19 +35,10 @@ NeopixelDriver<PixelType::GRB_SEQ3> npx;
 
 void setup(void) {
     // Logging
-    esp_log_level_set("*", ESP_LOG_DEBUG); // set log level to include ESP_LOGD messages
+    esp_log_level_set("*", ESP_LOG_DEBUG); // enable ESP_LOGD debug messages
     delay(3000);                           // wait for Platformio monitor to connect
 
     ESP_LOGI(TAG, "----- Running setup, chip=`%s` -----", CONFIG_IDF_TARGET);
-
-    // GPIO for Data output
-    if (dataPin == GPIO_NUM_NC) {
-        ESP_LOGE(TAG, "STOPPED: No dataPin configured");
-        for (;;) {
-            delay(100); // wait indefinitely
-        }
-    }
-    ESP_LOGI(TAG, "Using dataPin=%d", dataPin);
 
     // Optional: set Enable output to High
     if (enablePin != GPIO_NUM_NC) {
@@ -55,15 +46,14 @@ void setup(void) {
         pinMode(enablePin, OUTPUT);
         digitalWrite(enablePin, HIGH);
     } else {
-        ESP_LOGI(TAG, "Optional enablePin is NOT configured");
+        ESP_LOGI(TAG, "Optional enablePin is NOT configured (pin = %d)", enablePin);
     }
 
-    // Init the driver
-    ESP_LOGI(TAG, "Init the Neopixels on pin=%d with %d pixels", dataPin, nrNeopixels);
+    // Start the Neopixel Driver
     if (!npx.begin(nrNeopixels, dataPin)) {
-        ESP_LOGE(TAG, "STOPPED: init failed");
+        ESP_LOGE(TAG, "STOPPED: Failed to start the Neopixel Driver");
         for (;;) {
-            delay(100); // wait indefinitely
+            delay(100);
         }
     }
 
@@ -74,6 +64,7 @@ void setup(void) {
 
     // Let's go
     ESP_LOGI(TAG, "Start the Range animation");
+
     if (!npx.isRotatable()) {
         ESP_LOGW(TAG, "This `%s`/PixelType combination does NOT support the rotate method, so cannot do Chaser animation", CONFIG_IDF_TARGET);
         return;
@@ -83,7 +74,7 @@ void setup(void) {
 /*
 *******************************************************************************
     Run Chaser with 3 pixels in the specified range,
-    rotation a few times Right and then Left.
+    rotate a few times Right and then back Left.
 *******************************************************************************
 */
 static void chaserInRange(size_t startIndex, size_t endIndex) {
@@ -93,8 +84,9 @@ static void chaserInRange(size_t startIndex, size_t endIndex) {
     // Start position
     npx.setPixel(startIndex, neopixelBlue);
     npx.setPixel(startIndex + 1, neopixelGreen);
-    npx.setPixel(startIndex + 2, neopixelRed); // inittially the front pixel
+    npx.setPixel(startIndex + 2, neopixelRed); // on start this is the front pixel
     npx.show();
+
     if (!npx.isRotatable()) {
         return; // cannot do Chaser with rotate
     }
@@ -121,7 +113,7 @@ static void chaserInRange(size_t startIndex, size_t endIndex) {
     Main
 
     The Neopixels are divided into four quarters,
-    that are shifted (ring: rotated) after each Chase sequence.
+    that are shifted (ring: rotated) after each Chaser sequence.
 *******************************************************************************
  */
 void loop(void) {
@@ -133,19 +125,19 @@ void loop(void) {
     static const int delayMillis = 1000; // for better UX
 
     //---------------------------------
-    //  Q1+Q2 white, chaser in Q3+Q4
+    //  Q1+Q2 white, Chaser in Q3+Q4
     //---------------------------------
-    npx.setAllPixels(neopixelBlack); // clear all pixels before setting the new ranges
+    npx.setPixelRange(startIndexQ3, nrNeopixels - 1, neopixelBlack);
     npx.setPixelRange(startIndexQ1, startIndexQ3 - 1, dimmedWhite);
     npx.show();
-    delay(delayMillis); // show the white range before starting the chaser
-    chaserInRange(startIndexQ3, nrNeopixels - 1);
-    delay(delayMillis); // show the end position of the chaser
+    delay(delayMillis);                           // delay to show the white range before starting the chaser
+    chaserInRange(startIndexQ3, nrNeopixels - 1); // run the Chaser animation
+    delay(delayMillis);                           // delay to show the end position of the Chaser pixels
 
     //---------------------------------
-    //  Q2+Q3 white, chaser in Q4+Q1
+    //  Q2+Q3 white, Chaser in Q4+Q1
     //---------------------------------
-    npx.setAllPixels(neopixelBlack);
+    npx.setPixelRange(startIndexQ4, startIndexQ2 - 1, neopixelBlack); // note that this wraps around the end of the Neopixels
     npx.setPixelRange(startIndexQ2, startIndexQ4 - 1, dimmedWhite);
     npx.show();
     delay(delayMillis);
@@ -153,9 +145,9 @@ void loop(void) {
     delay(delayMillis);
 
     //---------------------------------
-    //  Q3+Q4 white, chaser in Q1+Q2
+    //  Q3+Q4 white, Chaser in Q1+Q2
     //---------------------------------
-    npx.setAllPixels(neopixelBlack);
+    npx.setPixelRange(startIndexQ1, startIndexQ3 - 1, neopixelBlack);
     npx.setPixelRange(startIndexQ3, nrNeopixels - 1, dimmedWhite);
     npx.show();
     delay(delayMillis);
@@ -163,9 +155,9 @@ void loop(void) {
     delay(delayMillis);
 
     //---------------------------------
-    //  Q4+Q1 white, chaser in Q2+Q3
+    //  Q4+Q1 white, Chaser in Q2+Q3
     //---------------------------------
-    npx.setAllPixels(neopixelBlack);
+    npx.setPixelRange(startIndexQ2, startIndexQ4 - 1, neopixelBlack);
     npx.setPixelRange(startIndexQ4, startIndexQ2 - 1, dimmedWhite); // note that this wraps around the end of the Neopixels
     npx.show();
     delay(delayMillis);

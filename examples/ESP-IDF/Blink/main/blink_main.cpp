@@ -34,13 +34,20 @@ static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of the
 -----------------------------------------------------------
 */
 static void configureStatusLed(void) {
-    ESP_LOGI(TAG, "Status LED on GPIO=%d", statusLedPin);
-    gpio_reset_pin(statusLedPin);
-    gpio_set_direction(statusLedPin, GPIO_MODE_OUTPUT);
+
+    if (statusLedPin != GPIO_NUM_NC) {
+        ESP_LOGI(TAG, "Status LED on GPIO=%d", statusLedPin);
+        gpio_reset_pin(statusLedPin);
+        gpio_set_direction(statusLedPin, GPIO_MODE_OUTPUT);
+    } else {
+        ESP_LOGW(TAG, "Status LED pin is NOT configured (pin = %d), Status LED will not blink", statusLedPin);
+    }
 }
 
 static void blinkStatusLed(bool isOn) {
-    gpio_set_level(statusLedPin, !isOn); // LED is active low
+    if (statusLedPin != GPIO_NUM_NC) {
+        gpio_set_level(statusLedPin, !isOn); // LED is active low
+    }
 }
 
 /*
@@ -58,16 +65,18 @@ void startNeopixel(void) {
         gpio_set_direction(enablePin, GPIO_MODE_OUTPUT);
         gpio_set_level(enablePin, 1);
     } else {
-        ESP_LOGI(TAG, "Optional enablePin is NOT configured");
+        ESP_LOGI(TAG, "Optional enablePin is NOT configured (pin = %d)", enablePin);
     }
 
-    // Optional: Increase logging of the Neopixel driver and its I2S subsystem
-    esp_log_level_set("NPIX", ESP_LOG_DEBUG);
-    esp_log_level_set("I2S_", ESP_LOG_DEBUG);
+    // Start the Neopixel Driver
+    if (!npx.begin(nrNeopixels, dataPin)) {
+        ESP_LOGE(TAG, "STOPPED: Failed to start the Neopixel Driver");
+        for (;;) {
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+        }
+    }
 
-    // Start the Neopixel driver
-    ESP_LOGI(TAG, "Starting the Neopixel driver on pin=%d with %d pixels", dataPin, nrNeopixels);
-    npx.begin(nrNeopixels, dataPin);
+    // Preset the Neopixels
     npx.setAllPixels(neopixelBlack); // set all pixels to black
     npx.show();                      // send the data to the Neopixels
     npx.brightness = 0x10;           // medium brightness
@@ -88,7 +97,14 @@ void blinkNeopixel(bool isOn) {
 ***********************************************************
  */
 extern "C" void app_main(void) {
+    // Increase logging for this program, the Neopixel Driver and the I2S subsystem.
+    // Do NOT set it for all components ("*") because that would show each I2S enable/disable at ESP-IDF level
+    esp_log_level_set(TAG, ESP_LOG_DEBUG);
+    esp_log_level_set("NPIX", ESP_LOG_DEBUG);
+    esp_log_level_set("I2S_", ESP_LOG_DEBUG);
     vTaskDelay(3000 / portTICK_PERIOD_MS); // allow Terminal to connect
+
+    ESP_LOGI(TAG, "----- Startup, chip=`%s` -----", CONFIG_IDF_TARGET);
     configureStatusLed();
     startNeopixel();
 

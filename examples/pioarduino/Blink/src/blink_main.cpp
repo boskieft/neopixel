@@ -23,7 +23,7 @@ static const gpio_num_t statusLedPin = GPIO_NUM_8; // optional output pin to dri
 
 /*
 ===============================================================================
-    Start the Neopixel driver and the Status LED
+    Start the Neopixel Driver and the Status LED
 ===============================================================================
 */
 static const size_t nrNeopixels = 1; // just one (1) Neopixel to drive
@@ -31,7 +31,7 @@ NeopixelDriver<PixelType::GRB_SEQ3> npx;
 
 void setup(void) {
     // Logging
-    esp_log_level_set("*", ESP_LOG_DEBUG); // set log level to include ESP_LOGD messages
+    esp_log_level_set("*", ESP_LOG_DEBUG); // enable ESP_LOGD debug messages
     delay(3000);                           // wait for Platformio monitor to connect
 
     ESP_LOGI(TAG, "----- Running setup, chip=`%s` -----", CONFIG_IDF_TARGET);
@@ -41,17 +41,8 @@ void setup(void) {
         ESP_LOGI(TAG, "Using statusLedPin=%d", statusLedPin);
         pinMode(statusLedPin, OUTPUT);
     } else {
-        ESP_LOGW(TAG, "Optional statusLedPin is NOT configured, Status LED will not blink");
+        ESP_LOGW(TAG, "Optional statusLedPin is NOT configured (pin = %d), Status LED will not blink", statusLedPin);
     }
-
-    // GPIO for Data output
-    if (dataPin == GPIO_NUM_NC) {
-        ESP_LOGE(TAG, "STOPPED: No dataPin configured");
-        for (;;) {
-            delay(100); // wait indefinitely
-        }
-    }
-    ESP_LOGI(TAG, "Using dataPin=%d", dataPin);
 
     // Optional: set Enable output to High
     if (enablePin != GPIO_NUM_NC) {
@@ -59,15 +50,14 @@ void setup(void) {
         pinMode(enablePin, OUTPUT);
         digitalWrite(enablePin, HIGH);
     } else {
-        ESP_LOGI(TAG, "Optional enablePin is NOT configured");
+        ESP_LOGI(TAG, "Optional enablePin is NOT configured (pin = %d)", enablePin);
     }
 
-    // Init the driver
-    ESP_LOGI(TAG, "Init the Neopixels on pin=%d with %d pixels", dataPin, nrNeopixels);
+    // Start the Neopixel Driver
     if (!npx.begin(nrNeopixels, dataPin)) {
-        ESP_LOGE(TAG, "STOPPED: init failed");
+        ESP_LOGE(TAG, "STOPPED: Failed to start the Neopixel Driver");
         for (;;) {
-            delay(100); // wait indefinitely
+            delay(100);
         }
     }
 
@@ -90,7 +80,6 @@ void loop(void) {
 
     if (isOn) {
         npx.setPixel(0, neopixelRed);
-
     } else {
         npx.setPixel(0, neopixelBlack);
     }
