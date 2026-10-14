@@ -89,5 +89,5 @@ class NeopixelTransmitControl {
 
     virtual bool init(gpio_num_t dataPin, uint32_t bitRate, size_t rawDataSize, size_t *requiredBufferSizePtr);
     virtual void deinit(void);
-    virtual void startTransmit(uint8_t *buffer, size_t bufferSize);
+    virtual bool startTransmit(uint8_t *buffer, size_t bufferSize);
 };

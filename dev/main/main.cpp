@@ -1,6 +1,11 @@
 /*
 *******************************************************************************
-    Test program, to showcase all major functions of the Neopixel driver
+    Test Program, to showcase some functions of the Neopixel Driver:
+    - set a single pixel
+    - set all pixels
+    - rotate the pixels
+
+    The program also monitors and logs the statistics of the Neopixel Driver.
 
     Copyright (c) 2026 Erik Boskieft. All rights reserved.
     Released under the MIT License, see the LICENSE file for details.
@@ -55,7 +60,7 @@ static const gpio_num_t dataPin = GPIO_NUM_2;    // output data pin to DI of Neo
 
 /*
 ===============================================================================
-    Start the Neopixel driver
+    Start the Neopixel Driver
 ===============================================================================
 */
 #if (1 == 1)
@@ -76,21 +81,23 @@ static const size_t rotateSteps = nrNeopixels / 4; // number of steps to showcas
 
 static void startNeopixel(void) {
     // Optional: set Enable output to High
-    if (enablePin != GPIO_NUM_NC) {
+    if (GPIO_IS_VALID_OUTPUT_GPIO(enablePin)) {
         ESP_LOGI(TAG, "Switching On enablePin=%d", enablePin);
         gpio_set_direction(enablePin, GPIO_MODE_OUTPUT);
         gpio_set_level(enablePin, 1);
     } else {
-        ESP_LOGI(TAG, "Optional enablePin is NOT configured");
+        ESP_LOGI(TAG, "Optional enablePin is NOT configured (pin = %d)", enablePin);
     }
 
-    // Increase logging of the Neopixel driver and I2S subsystem
-    esp_log_level_set("NPIX", ESP_LOG_DEBUG);
-    esp_log_level_set("I2S_", ESP_LOG_DEBUG);
+    // Start the Neopixel Driver
+    if (!npx.begin(nrNeopixels, dataPin)) {
+        ESP_LOGE(TAG, "STOPPED: Failed to start the Neopixel Driver");
+        for (;;) {
+            vTaskDelay(100 / portTICK_PERIOD_MS);
+        }
+    }
 
-    // Init the driver
-    ESP_LOGI(TAG, "Init the Neopixel Driver on dataPin=%d with nrNeopixels=%d", dataPin, nrNeopixels);
-    npx.begin(nrNeopixels, dataPin); // just one (1) pixel for this example
+    // Preset the Neopixels
     npx.setAllPixels(neopixelBlack); // set all pixels to black
     npx.show();                      // send the data to the Neopixel ring
     npx.brightness = 0x10;           // medium brightness
@@ -317,17 +324,17 @@ static void animateNeopixels(unsigned long currentMillis) {
 ===============================================================================
 */
 static void configureStatusLed(void) {
-    if (statusLedPin != GPIO_NUM_NC) {
-        ESP_LOGI(TAG, "Status LED on GPIO=%d", statusLedPin);
+    if (GPIO_IS_VALID_OUTPUT_GPIO(statusLedPin)) {
+        ESP_LOGI(TAG, "Status LED configured on pin=%d", statusLedPin);
         gpio_reset_pin(statusLedPin);
         gpio_set_direction(statusLedPin, GPIO_MODE_OUTPUT);
     } else {
-        ESP_LOGI(TAG, "Optional Status LED is NOT configured");
+        ESP_LOGI(TAG, "Optional Status LED is NOT configured (pin = %d)", statusLedPin);
     }
 }
 
 static void toggleStatusLed(void) {
-    if (statusLedPin != GPIO_NUM_NC) {
+    if (GPIO_IS_VALID_OUTPUT_GPIO(statusLedPin)) {
         static bool isOn = false;
         gpio_set_level(statusLedPin, isOn);
         isOn = !isOn;
@@ -340,7 +347,14 @@ static void toggleStatusLed(void) {
 *******************************************************************************
 */
 extern "C" void app_main(void) {
-    ESP_LOGI(TAG, "----- Starting application, chip=`%s` -----", CONFIG_IDF_TARGET);
+    // Increase logging for this program, the Neopixel Driver and the I2S subsystem.
+    // Do NOT set it for all components ("*") because that would show each I2S enable/disable at ESP-IDF level
+    esp_log_level_set(TAG, ESP_LOG_DEBUG);
+    esp_log_level_set("NPIX", ESP_LOG_DEBUG);
+    esp_log_level_set("I2S_", ESP_LOG_DEBUG);
+    vTaskDelay(3000 / portTICK_PERIOD_MS); // allow Terminal to connect
+
+    ESP_LOGI(TAG, "----- Starting Test Program, chip=`%s` -----", CONFIG_IDF_TARGET);
 
     configureStatusLed();
     startNeopixel();

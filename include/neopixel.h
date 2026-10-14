@@ -91,7 +91,7 @@ class NeopixelDriver {
     NeopixelTransmitControl txControl; // class to control Neopixel data transmission, initialized with the stats pointer in the constructor
 
     // Private helper to fill a range of pixels with the specified color
-    void _fillPixelRange(size_t startIndex, size_t nrPixelsInRange, const PixelColor color);
+    bool fillPixelRange_(size_t startIndex, size_t nrPixelsInRange, const PixelColor color);
 
   public:
     uint8_t brightness = 255;                     // global brightness (min=0...max=255)
@@ -129,19 +129,26 @@ class NeopixelDriver {
         return (colorsPerPixel == 4);
     }
 
-    void show(void) {
-        txControl.startTransmit(buffer, bufferSize); // transmit the buffer to the Neopixels
+    bool show(void) {
+        return (txControl.startTransmit(buffer, bufferSize)); // transmit the buffer to the Neopixels
     }
 
     //-------------------------------------------
     //  Set pixel(s)
+    //
+    //  Returns false if index is out of range,
+    //  true otherwise
     //-------------------------------------------
-    void setPixel(const size_t index, const PixelColor color);
-    void setAllPixels(const PixelColor color);
-    void setPixelRange(size_t startIndex, size_t endIndex, const PixelColor color);
+    bool setPixel(const size_t index, const PixelColor color);
+    bool setAllPixels(const PixelColor color);
+    bool setPixelRange(size_t startIndex, size_t endIndex, const PixelColor color);
 
     //-------------------------------------------
     //  Rotate pixels
+    //
+    //  Returns false if index is out of range
+    //  OR: Neopixels are not rotatable,
+    //  true otherwise
     //-------------------------------------------
     bool isRotatable(void) const {
         return ((nrPixels > 1) &&                       // useless to rotate if only one pixel
@@ -150,9 +157,9 @@ class NeopixelDriver {
         );
     }
 
-    void rotateAllLeft(void);
-    void rotateAllRight(void);
+    bool rotateAllLeft(void);
+    bool rotateAllRight(void);
 
-    void rotateRangeLeft(size_t startIndex, size_t endIndex);
-    void rotateRangeRight(size_t startIndex, size_t endIndex);
+    bool rotateRangeLeft(size_t startIndex, size_t endIndex);
+    bool rotateRangeRight(size_t startIndex, size_t endIndex);
 };

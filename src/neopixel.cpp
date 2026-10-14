@@ -34,13 +34,20 @@ bool NeopixelDriver<Mode>::begin(
 
     uint32_t bitRate;
 
+    ESP_LOGI(TAG, "Beginning the Neopixel Driver on dataPin=%d with %d Neopixels", dataPin, arg_nrPixels);
+
+    if (buffer != nullptr) {
+        ESP_LOGE(TAG, "Already initialised");
+        return (false);
+    }
+
     if (arg_nrPixels == 0) {
         ESP_LOGE(TAG, "Number of pixels must be greater than zero");
         return (false);
     }
 
-    if (buffer != nullptr) {
-        ESP_LOGE(TAG, "Already initialised");
+    if (!GPIO_IS_VALID_OUTPUT_GPIO(dataPin)) {
+        ESP_LOGE(TAG, "Invalid Neopixel dataPin=%d", static_cast<int>(dataPin));
         return (false);
     }
 
@@ -117,12 +124,12 @@ bool NeopixelDriver<Mode>::begin(
 ===================================================================================================
 */
 template <PixelType Mode>
-void NeopixelDriver<Mode>::setPixel(
+bool NeopixelDriver<Mode>::setPixel(
     const size_t index, // index of the pixel to set, [0]=first
     PixelColor pixel) { // new color of the pixel
 
     if (index >= nrPixels) {
-        return; // silently ignore
+        return (false); // silently ignore
     }
 
     if (brightness != 255) {
@@ -256,7 +263,11 @@ void NeopixelDriver<Mode>::setPixel(
         set_seq4_color(pixel.color.r, &buffer[offset + NEOPIXEL_SEQ4_BYTES_PER_COLOR]);
         set_seq4_color(pixel.color.b, &buffer[offset + (2 * NEOPIXEL_SEQ4_BYTES_PER_COLOR)]);
         set_seq4_color(pixel.color.w, &buffer[offset + (3 * NEOPIXEL_SEQ4_BYTES_PER_COLOR)]);
-    } // else: unknown pixel type, should not occur
+    } else {
+        // Unknown pixel type, should not occur
+        return (false);
+    }
+    return (true);
 }
 
 /*
@@ -266,10 +277,12 @@ void NeopixelDriver<Mode>::setPixel(
 ---------------------------------------------------------------------------------------------------
 */
 template <PixelType Mode>
-void NeopixelDriver<Mode>::_fillPixelRange(size_t startIndex, size_t nrPixelsInRange, const PixelColor color) {
+bool NeopixelDriver<Mode>::fillPixelRange_(size_t startIndex, size_t nrPixelsInRange, const PixelColor color) {
     // First use setPixel for two (!) pixels,
     // to avoid issue with odd number of bytesPerPixel and Little-Endian byte order
-    setPixel(startIndex, color);
+    if (!setPixel(startIndex, color)) {
+        return (false);
+    }
     if (nrPixelsInRange > 1) {
         setPixel(startIndex + 1, color);
 
@@ -289,6 +302,7 @@ void NeopixelDriver<Mode>::_fillPixelRange(size_t startIndex, size_t nrPixelsInR
             memcpy(&startBufferRange[copiedBytes], startBufferRange, restBytes);
         }
     } // else: just one (1) Neopixel in the range
+    return (true);
 }
 
 /*
@@ -297,8 +311,8 @@ void NeopixelDriver<Mode>::_fillPixelRange(size_t startIndex, size_t nrPixelsInR
 ===================================================================================================
 */
 template <PixelType Mode>
-void NeopixelDriver<Mode>::setAllPixels(const PixelColor color) {
-    _fillPixelRange(0, nrPixels, color);
+bool NeopixelDriver<Mode>::setAllPixels(const PixelColor color) {
+    return (fillPixelRange_(0, nrPixels, color));
 }
 
 /*
@@ -310,22 +324,24 @@ void NeopixelDriver<Mode>::setAllPixels(const PixelColor color) {
 ===================================================================================================
 */
 template <PixelType Mode>
-void NeopixelDriver<Mode>::setPixelRange(size_t startIndex, size_t endIndex, const PixelColor color) {
+bool NeopixelDriver<Mode>::setPixelRange(size_t startIndex, size_t endIndex, const PixelColor color) {
     // Protect against invalid indices
     if (startIndex >= nrPixels || endIndex >= nrPixels) {
-        return;
+        return (false);
     }
+    // No need to check fillPixelRange_() return value from here
 
     if (startIndex <= endIndex) {
         // Fill the normal range (inclusive)
-        _fillPixelRange(startIndex, endIndex - startIndex + 1, color);
+        fillPixelRange_(startIndex, endIndex - startIndex + 1, color);
     } else {
         // Wrap around: first fill from startIndex to the last Neopixel
-        _fillPixelRange(startIndex, nrPixels - startIndex, color);
+        fillPixelRange_(startIndex, nrPixels - startIndex, color);
 
         // Next fill from the first Neopixel to endIndex (inclusive)
-        _fillPixelRange(0, endIndex + 1, color);
+        fillPixelRange_(0, endIndex + 1, color);
     }
+    return (true);
 }
 
 /*
@@ -334,9 +350,9 @@ void NeopixelDriver<Mode>::setPixelRange(size_t startIndex, size_t endIndex, con
 ===================================================================================================
 */
 template <PixelType Mode>
-void NeopixelDriver<Mode>::rotateAllLeft(void) {
+bool NeopixelDriver<Mode>::rotateAllLeft(void) {
     if (!isRotatable()) {
-        return; // just do nothing
+        return (false); // just do nothing
     }
 
     // Remember first
@@ -346,12 +362,13 @@ void NeopixelDriver<Mode>::rotateAllLeft(void) {
     memmove(&buffer[0], &buffer[txBytesPerPixel], txBytesPerPixel * (nrPixels - 1));
     // Put first at the end
     memcpy(&buffer[(nrPixels - 1) * txBytesPerPixel], copiedBytes, txBytesPerPixel);
+    return (true);
 }
 
 template <PixelType Mode>
-void NeopixelDriver<Mode>::rotateAllRight(void) {
+bool NeopixelDriver<Mode>::rotateAllRight(void) {
     if (!isRotatable()) {
-        return; // just do nothing
+        return (false); // just do nothing
     }
 
     // Remember last
@@ -361,6 +378,7 @@ void NeopixelDriver<Mode>::rotateAllRight(void) {
     memmove(&buffer[txBytesPerPixel], &buffer[0], txBytesPerPixel * (nrPixels - 1));
     // Put last as first
     memcpy(&buffer[0], copiedBytes, txBytesPerPixel);
+    return (true);
 }
 
 /*
@@ -369,11 +387,11 @@ void NeopixelDriver<Mode>::rotateAllRight(void) {
 ===================================================================================================
 */
 template <PixelType Mode>
-void NeopixelDriver<Mode>::rotateRangeLeft(size_t startIndex, size_t endIndex) {
+bool NeopixelDriver<Mode>::rotateRangeLeft(size_t startIndex, size_t endIndex) {
     if (!isRotatable() || nrPixels < 2 ||
         startIndex >= nrPixels || endIndex >= nrPixels ||
         startIndex == endIndex) {
-        return;
+        return (false);
     }
 
     if (startIndex < endIndex) {
@@ -422,6 +440,7 @@ void NeopixelDriver<Mode>::rotateRangeLeft(size_t startIndex, size_t endIndex) {
         memcpy(&buffer[(nrPixels - 1) * txBytesPerPixel], firstPixelBytes, txBytesPerPixel);
         memcpy(&buffer[endIndex * txBytesPerPixel], startPixelBytes, txBytesPerPixel);
     }
+    return (true);
 }
 
 /*
@@ -430,11 +449,11 @@ void NeopixelDriver<Mode>::rotateRangeLeft(size_t startIndex, size_t endIndex) {
 ===================================================================================================
 */
 template <PixelType Mode>
-void NeopixelDriver<Mode>::rotateRangeRight(size_t startIndex, size_t endIndex) {
+bool NeopixelDriver<Mode>::rotateRangeRight(size_t startIndex, size_t endIndex) {
     if (!isRotatable() || nrPixels < 2 ||
         startIndex >= nrPixels || endIndex >= nrPixels ||
         startIndex == endIndex) {
-        return;
+        return (false);
     }
 
     if (startIndex < endIndex) {
@@ -484,4 +503,5 @@ void NeopixelDriver<Mode>::rotateRangeRight(size_t startIndex, size_t endIndex) 
         memcpy(&buffer[startIndex * txBytesPerPixel], endPixelBytes,
                txBytesPerPixel);
     }
+    return (true);
 }

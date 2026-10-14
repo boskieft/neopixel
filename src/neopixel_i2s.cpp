@@ -95,20 +95,10 @@ static void setDMAconfig(
 ===================================================================================================
 */
 bool NeopixelTransmitControl::init(
-    gpio_num_t dataPin,              // GPIO pin used for the I2S data output
+    gpio_num_t dataPin,              // GPIO pin used for the I2S data output (must be a valid output GPIO)
     uint32_t bitRate,                // [bps] bit rate for the I2S transmission
-    size_t rawDataSize,              // [bytes] size of the raw Neopixel data, in general: nrPixels * bytesPerPixel
+    size_t rawDataSize,              // [bytes] size of the raw Neopixel data (must be > 0), in general: nrPixels * bytesPerPixel
     size_t *requiredBufferSizePtr) { // pointer to store the required buffer size [bytes] for the I2S transmission
-
-    if (rawDataSize == 0) {
-        ESP_LOGE(TAG, "Raw data size must be greater than zero");
-        return (false);
-    }
-
-    if (dataPin == I2S_GPIO_UNUSED) {
-        ESP_LOGE(TAG, "Data pin must be specified");
-        return (false);
-    }
 
     // Store the RTOS handle to parent Task, for sending Notifications to
     // This CANNOT be done in the constructor, when the Task is not active yet
@@ -294,7 +284,7 @@ IRAM_ATTR bool NeopixelTransmitControl::onSentCallback(
 */
 #define NEOPIXEL_MINIMUM_INTERVAL_US (1000)
 
-void NeopixelTransmitControl::startTransmit(
+bool NeopixelTransmitControl::startTransmit(
     uint8_t *buffer,     // pointer to the data buffer containing the Neopixel data
     size_t bufferSize) { // size of the buffer [bytes], should match the bufferSize determined at init()
 
@@ -308,7 +298,7 @@ void NeopixelTransmitControl::startTransmit(
     if (!waitForNotification(RSP_READY)) {
         // Timeout waiting for the I2S Task to become ready
         statsPtr->nrTimeouts++;
-        return;
+        return (false);
     }
 #else
     if (startMicros < (endMicros + NEOPIXEL_MINIMUM_INTERVAL_US)) {
@@ -321,6 +311,15 @@ void NeopixelTransmitControl::startTransmit(
 #endif
 
     //-------------------------------------------
+    //  Check the data
+    //-------------------------------------------
+    if ((buffer == nullptr) || (bufferSize == 0)) {
+        ESP_LOGE(TAG, "Data buffer is not initialized");
+        statsPtr->nrPreloadDataErrors++;
+        return (false);
+    }
+
+    //-------------------------------------------
     //  Preload the data into I2S
     //-------------------------------------------
     size_t bytesLoaded = 0;
@@ -329,7 +328,7 @@ void NeopixelTransmitControl::startTransmit(
         (unlikely(bytesLoaded != bufferSize))) {
         ESP_LOGE(TAG, "Preload of data buffer failed");
         statsPtr->nrPreloadDataErrors++;
-        return;
+        return (false);
     }
 
     // Add dummy flush DMA chunk, that can be retransmitted without any harm while the I2S channel is finalising
@@ -341,7 +340,7 @@ void NeopixelTransmitControl::startTransmit(
         (unlikely(bytesLoaded != sizeof(dummy_flush)))) {
         ESP_LOGE(TAG, "Preload of dummy flush failed");
         statsPtr->nrPreloadDataErrors++;
-        return;
+        return (false);
     }
 
 //-------------------------------------------
@@ -360,6 +359,7 @@ void NeopixelTransmitControl::startTransmit(
         statsPtr->maxSendMicros = deltaMicros;
         ESP_LOGD(TAG, "maxSendMicros=%lld", statsPtr->maxSendMicros);
     }
+    return (true);
 }
 
 #if (ENABLE_I2S_TASK_VERSION)
