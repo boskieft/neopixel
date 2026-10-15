@@ -1,18 +1,18 @@
 # How to build using pioarduino
 
-The Platformio variant `pioarduio` can be used to build and test an example from this folder.
+The PlatformIO variant `pioarduino` can be used to build and test an example from this folder.
 
-NOTE: the original `Platformio` cannot be used with Arduino anymore, because Platformio ceased their support years ago. The old version is still available, but does not work with recent ESP-IDF v5 and up (v5.5.5 is required for the Neopixel Driver).
+NOTE: the original `PlatformIO` cannot be used with Arduino anymore, because PlatformIO ceased support years ago. The old version is still available, but does not work with recent ESP-IDF v5 and up (v5.5.5 is required for the Neopixel Driver).
 
 ## Software required
 
 Virtual Studio Code (VSC) with the `pioarduino` extension version 1.4.4 or above.
 
-NOTE: when using the `pioarduino` extension, make sure you don't have the original `Platformio` installed as well, bacause this can cause weird problems.
+NOTE: when using the `pioarduino` extension, make sure you don't have the original `PlatformIO` installed as well, because this can cause weird problems.
 
 ## Select an ESP-IDF example
 
-Copy/Clone the from an example (e.g. examples\pioarduino\Chaser) the next folder/files into a local project folder, eg: `<YourPath>\pio-chaser`
+Copy/clone the files from an example (e.g. examples\pioarduino\Chaser) into a local project folder, e.g. `<YourPath>\pio-chaser`
 
 * folder: examples\pioarduino\Chaser\src -> \<YourPath\>\pio-chaser\src
 * file: examples\pioarduino\set_gpio.h -> \<YourPath\>\pio-chaser\src
@@ -55,17 +55,17 @@ pio-chaser
 |-- platformio.ini
 ```
 
-## EPS32xx variants, GPIO numbers
+## ESP32xx variants, GPIO numbers
 
-In the file `platformio.ini` my (Eriks) ESP32xx variants and their boards are defined. You can change this to your needs. Make sure the [env:esp32xx] lowercase names match with the CONFIG_IDF_TARGET_ESP32xx uppercase names in `set_gpio.h`.
+The file `platformio.ini` contains my (Erik's) ESP32xx variants and their boards. You can change this to suit your needs. Make sure the `[env:esp32xx]` lowercase names match the `CONFIG_IDF_TARGET_ESP32xx` uppercase names in `set_gpio.h`.
 
 The file `set_gpio.h` sets the correct GPIO pin numbers, based on the selected esp32xx chip in VSC, pioarduino -> Project Tasks (see Build paragraph below). This is especially convenient when working with multiple ESP32xx variants.
 
-NOTE: the GPIO pin(s) are fully depend on the used ESP32xx chip and the hardware circuit around it. Most probably you have to change it to your situation. You can do this in `set_gpio.h`, or directly in the example *.cpp file (and comment-out the #include of `set_gpio.h`):
+NOTE: the GPIO pin(s) depend on the used ESP32xx chip and the hardware circuit around it. Most probably you have to change it for your situation. You can do this in `set_gpio.h`, or directly in the example *.cpp file (and comment out the #include of `set_gpio.h`):
 
-* `dataPin` is mandatory, it is the output data pin towards the digital Inpit (DI) of the Neopixels (possibly via 74HCT126 level shifter).
-* `enablePin` is only needed in case your (74HCT126) level shifter has an Enable input, that needs to be driven by your ESP32xx chip. Otherwise set `enablePin = GPIO_NUM_NC`.
-* `statusLedPin` is also optional, it can be used for example in the Blink example to drive the classic on/off Status LED as well. If you don't need it, set `statusLedPin = GPIO_NUM_NC`.
+* `dataPin` is mandatory; it is the output data pin towards the digital input (DI) of the Neopixels (possibly via a 74HCT126 level shifter).
+* `enablePin` is only needed if your (74HCT126) level shifter has an Enable input that needs to be driven by your ESP32xx chip. Otherwise set `enablePin = GPIO_NUM_NC`.
+* `statusLedPin` is also optional; it can be used, for example, in the Blink example to drive the classic on/off status LED as well. If you don't need it, set `statusLedPin = GPIO_NUM_NC`.
 
 ## pioarduino version
 
@@ -73,11 +73,11 @@ The used pioarduino version is fixed in `platformio.ini`, for example:
 
 ```platform = https://github.com/pioarduino/platform-espressif32/releases/download/55.03.311/platform-espressif32.zip```
 
-As you can guess by the numbers above, this version uses Arduino v3.3.11 based on ESP-IDFv5.5.5.
+As you can guess by the numbers above, this version uses Arduino v3.3.11 based on ESP-IDF v5.5.5.
 
-Pioarduino is updated on a regular base, see: <https://github.com/pioarduino/platform-espressif32/releases>
+pioarduino is updated on a regular basis; see: <https://github.com/pioarduino/platform-espressif32/releases>
 
-You can use a newer `pioarduino` version by updating the above line in `Platformio.ini`.
+You can use a newer `pioarduino` version by updating the above line in `platformio.ini`.
 
 ## NOTE on red squiggles and warnings
 
@@ -94,7 +94,7 @@ In left sidebar of VSC, select `pioarduino`
 Pioarduino -> `Project Tasks`
 
 * Select your ESP32xx configuration, e.g. `esp32c3`
-* (NOTE: as stated before, the ESP32xx variants are defined in Platformio.ini as `[env:esp32xx]`)
+* (NOTE: as stated before, the ESP32xx variants are defined in `platformio.ini` as `[env:esp32xx]`)
 
 The first time you click on `esp32xx`, pioarduino will setup the environment for that ESP32xx and close the folder you just opened. Once pioarduino is done (see progress bar on top), open the folder again to build the example.
 
@@ -190,9 +190,9 @@ The first time you need to specify the `Port` for seeing the logs. In the top ba
 
 The tab [ESP Decode] will now show the ESP32xx logging, first part comes from Arduino, then the logs from your application.
 
-NOTE 1: after `Upload and Monitor`, the [ESP Decoder] starts up a bit too slow, causing it to skip the first log lines. By clicking first [Clear] to remove the current logs, and then [Reset] you can start the ESP323xx device again, and this time you will see everything.
+NOTE 1: after `Upload and Monitor`, the [ESP Decoder] starts up a bit too slow, causing it to skip the first log lines. By clicking [Clear] first to remove the current logs, and then [Reset], you can start the ESP32xx device again, and this time you will see everything.
 
-NOTE 2: in `platformio.ini` the logging is set to Debug level, you can change it the Info to get rid of most startup logs.
+NOTE 2: in `platformio.ini` the logging is set to Debug level; you can change it to Info to get rid of most startup logs.
 
 ```code
 ESP-ROM:esp32c3-api1-20210207

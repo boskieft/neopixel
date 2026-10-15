@@ -8,7 +8,7 @@ Features:
 
 - **ESP32xx family:** Tested on 5 ESP32xx variants (see paragraph below).
 - **ESP-IDF:** Works with and without the Arduino framework.
-- **I2S:** Using standard I2s driver of ESP-IDF 5.5:
+- **I2S:** Using the standard I2S driver of ESP-IDF 5.5:
   - DMA for minimal processor load and interrupts
   - Keeps SPI with DMA available for other purposes
 - **GRB/GRBW:** Configurable for GRB (3 colors) or GRBW (3 colors + white) Neopixels.
@@ -52,7 +52,7 @@ For development purposes, the `dev` folder contains the ESP-IDF environment to b
 
 See the README.md in the `dev` folder on how to use it.
 
-Initially, VSC may show #include errors and missing settings in the .vscode files. These will be solved automatically while bulding the Test Program.
+Initially, VSC may show #include errors and missing settings in the .vscode files. These will be solved automatically while building the Test Program.
 
 ## Functions
 

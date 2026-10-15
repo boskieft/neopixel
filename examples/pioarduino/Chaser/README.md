@@ -1,17 +1,17 @@
 # Neopixel Chaser Example
 
-This Example demonstrates the chaser effect: Neopixels are lit one after each other.
-Build and run in the `Pioarduino` environment.
+This example demonstrates the chaser effect: Neopixels are lit one after another.
+Build and run in the `pioarduino` environment.
 
 ## Change the GPIO numbers
 
-The used GPIO pins are defined in file `set_gpio.h` based on selected eps32 variant you build. Most probably you have to change the GPIO pins for your specific ESP32xx hardware configuration. You can do that in `set_gpio.h`, or by NOT using that file and setting them manually in `main.cpp`.
+The used GPIO pins are defined in `set_gpio.h`, based on the selected esp32 variant you build. Most probably you have to change the GPIO pins for your specific ESP32xx hardware configuration. You can do that in `set_gpio.h`, or by not using that file and setting them manually in `main.cpp`.
 
 ## Install and run
 
 See the generic instructions in the neopixel/examples/pioarduino/README.md
 
-The Neopixels will be lit one by one.
+The Neopixels will be lit one after another.
 
 The VSC Terminal will show detailed Debug logging like this:
 

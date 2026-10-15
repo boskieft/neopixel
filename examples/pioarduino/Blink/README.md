@@ -1,11 +1,11 @@
 # Neopixel Blink Example
 
-This Example demonstrates how to blink both the Status LED (on standard GPIO) and one Neopixel at the same time.
-Build and run in the `Pioarduino` environment.
+This example demonstrates how to blink both the status LED (on standard GPIO) and one Neopixel at the same time.
+Build and run in the `pioarduino` environment.
 
 ## Change the GPIO numbers
 
-The used GPIO pins are defined in file `set_gpio.h` based on selected eps32 variant you build. Most probably you have to change the GPIO pins for your specific ESP32xx hardware configuration. You can do that in `set_gpio.h`, or by NOT using that file and setting them manually in `main.cpp`.
+The used GPIO pins are defined in `set_gpio.h`, based on the selected esp32 variant you build. Most probably you have to change the GPIO pins for your specific ESP32xx hardware configuration. You can do that in `set_gpio.h`, or by not using that file and setting them manually in `main.cpp`.
 
 ## Install and run
 

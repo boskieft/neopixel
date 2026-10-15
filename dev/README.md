@@ -6,7 +6,7 @@ However, the `dev` directory (here) also contains a small ESP-IDF Test Program, 
 
 ## Copy/Clone
 
-Copy or clone the whole Neopixel Driver repository from Github into your local `neopixel` project folder.
+Copy or clone the whole Neopixel Driver repository from GitHub into your local `neopixel` project folder.
 
 ## Make link
 

@@ -6,7 +6,7 @@ Espressif's ESP-IDF can be used to build and test an ESP-IDF example from this f
 
 Virtual Studio Code (VSC) with the "ESP-IDF" extension version 6.1.0
 
-(in fact ESP-IDF v5.5.5 or higher should work, but the cmomands and reponses may be a bit different than shown here)
+(in fact ESP-IDF v5.5.5 or higher should work, but the commands and responses may be a bit different than shown here)
 
 ## Select an ESP-IDF example
 
@@ -41,13 +41,13 @@ You can ignore all this, it will be solved in the next step: Configure.
 
 ## NOTE on waiting!
 
-Do WAIT until the message `Waiting for ESD-IDF to setup CMake...` has disapperared from the VSC blue bottom row.
+Do WAIT until the message `Waiting for ESP-IDF to setup CMake...` has disappeared from the VSC blue bottom row.
 
 Also do WAIT for **FULL COMPLETION** of the upcoming `ESP-IDF: Explorer` commands, before starting a new one!
 
 ## Summary of commands
 
-Below and overview of the `ESP-IDF: Explorer` commands to run for an initial build.
+Below is an overview of the `ESP-IDF: Explorer` commands to run for an initial build.
 
 * `Set current ESP-IDF version` = v6.1.0
 * `Set Flash Method` = UART
@@ -57,7 +57,7 @@ Below and overview of the `ESP-IDF: Explorer` commands to run for an initial bui
 * `Select Port to Use (COM, tty, usbserial)` = detect, for automatic detection of the COMxx port
 * `Build, Flash and Monitor`
 
-Next paragraphs descibe these commands in more detail.
+The next paragraphs describe these commands in more detail.
 
 ## Configure
 
@@ -137,7 +137,7 @@ nvs,data,nvs,0x9000,24K,
 phy_init,data,phy,0xf000,4K,
 factory,app,factory,0x10000,1M,
 *******************************************************************************
-[xxx/yyy] compile and link files    <- gets udated very fast
+[xxx/yyy] compile and link files    <- gets updated very fast
 ```
 
 Finally, you get a table with memory usage, and a popup "(i) Build Successful" in the lower part of the VSC screen.

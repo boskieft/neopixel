@@ -1,13 +1,13 @@
 # Neopixel Rainbow Example
 
-This Example demonstrates the Rainbow effect: the colors of the rainbox will be rotated across the Neopixels.
+This example demonstrates the rainbow effect: the colors of the rainbow will be rotated across the Neopixels.
 Two methods are demonstrated: recalculating each frame and just rotating the pixels.
 
-Build and run in the `Pioarduino` environment.
+Build and run in the `pioarduino` environment.
 
 ## Change the GPIO numbers
 
-The used GPIO pins are defined in file `set_gpio.h` based on selected eps32 variant you build. Most probably you have to change the GPIO pins for your specific ESP32xx hardware configuration. You can do that in `set_gpio.h`, or by NOT using that file and setting them manually in `main.cpp`.
+The used GPIO pins are defined in `set_gpio.h`, based on the selected esp32 variant you build. Most probably you have to change the GPIO pins for your specific ESP32xx hardware configuration. You can do that in `set_gpio.h`, or by not using that file and setting them manually in `main.cpp`.
 
 ## Install and run
 
