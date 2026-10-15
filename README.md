@@ -7,15 +7,15 @@ This driver supports addressable RGB/RGBW LEDs using WS2812x / SK6812x compatibl
 Features:
 
 - **ESP32xx family:** Tested on 5 ESP32xx variants (see paragraph below).
-- **ESP-IDF:** Works with and without the Arduino framework.
-- **I2S:** Using the standard I2S driver of ESP-IDF 5.5:
+- **ESP-IDF:** Works on ESP-IDF v5.5.5 and above, with and without the (Pio)Arduino framework.
+- **I2S:** Using the standard I2S driver of ESP-IDF:
   - DMA for minimal processor load and interrupts
   - Keeps SPI with DMA available for other purposes
 - **GRB/GRBW:** Configurable for GRB (3 colors) or GRBW (3 colors + white) Neopixels.
 - **SEQ3/SEQ4:** Configurable for best match on your Neopixel's timing:
   - 3 bit sequence, period=1200ns, dutycycle: Off=33%, On=67%
   - 4 bit sequence, period=1200ns, dutycycle: Off=25%, On=50%
-- **1...N:** Drives 1 up to more than 20000 Neopixels (limited by memory and transmission time)
+- **1...N:** Drives 1 up to more than 20000 Neopixels (limited by RAM memory and transmission time < 1 sec)
 - **Fast:** Driver waits for transmission completion in separate task.
 - **Easy:** No polling, no throttling, the driver takes care.
 - **Rotate:** In-memory left or right rotation for (a range of) Neopixels
@@ -33,43 +33,26 @@ Tested successfully on the ESP32xx devices listed below.
 - ESP32-C3 (Mini Pro)
 - ESP32-C6 (Seeed)
 
-## Speed and RAM memory
-
-@@@TODO: describe typical show() response time
-@@@TODO: describe typical overall transmission time (or repetition rate) for 1, 10, 100 and 1000 Neopixels
-
-@@@TODO: describe buffer and DMA sizes for 1, 10, 100 and 1000 Neopixels
-
 ## Build environment
 
 The driver is written in C++ using the ESP-IDF environment, tested with version 5.5.5 (minimum) and 6.1 (current). It has no dependencies towards pioarduino or Arduino, but can just be used by them.
 
-## Development (dev) folder
-
-This repository is an ESP-IDF **_component_** (aka: library).
-
-For development purposes, the `dev` folder contains the ESP-IDF environment to build a Test Program. The repository root `CMakeLists.txt` supports direct ESP-IDF commands from this workspace while still acting as a reusable component when included elsewhere. This way, the component can easily be tested without having a separate (example) program.
-
-See the README.md in the `dev` folder on how to use it.
-
-Initially, VSC may show #include errors and missing settings in the .vscode files. These will be solved automatically while building the Test Program.
-
 ## Functions
 
 ```code
-begin(nrPixels, dataPin);         // initialise the driver
+begin(nrPixels, dataPin);         // initialise the driver, allocates buffer
 hasWhite();                       // returns true if the Neopixels have a separate white color LED
-show();                           // show the buffer (result of called set*() and rotate*() functions) on the Neopixels
+show();                           // send the buffer (result of called set*() and rotate*() functions) to the Neopixels
 
-setPixel(index, color);           // set Neopixel[index] to color
-setAllPixels(color);              // set all Neopixels to same color
-setPixelRange(start, end, color); // set range[start,end] of Neopixels to same color, do not change the others
+setPixel(index, color);           // set pixel[index] in the buffer to color
+setAllPixels(color);              // set all pixels in the buffer to same color
+setPixelRange(start, end, color); // set range[start,end] of pixels in the buffer to same color, do not change the others
 
-rotateAllLeft();                  // rotate all colors to the Left (decreasing index)
-rotateAllRight();                 // rotate all colors to the Right (increasing index)
+rotateAllLeft();                  // rotate all pixels in the buffer to the Left (decreasing index)
+rotateAllRight();                 // rotate all pixels in the buffer to the Right (increasing index)
 
-rotateRangeLeft(start, end);      // rotate the range[start,end] of Neopixels to the Left, do not change the others
-rotateRangeRight(start, end);     // rotate the range[start,end] of Neopixels to the Right, do not change the others
+rotateRangeLeft(start, end);      // rotate the range[start,end] of pixels in the buffer to the Left, do not change the others
+rotateRangeRight(start, end);     // rotate the range[start,end] of pixels in the buffer to the Right, do not change the others
 ```
 
 ## PixelColor
@@ -83,7 +66,7 @@ PixelColor red = {.value = 0xff0000};                               // 0x(ww)rrg
 PixelColor green = {.color = {.b = 0, .g = 0xff, .r = 0, .w = 0}};  // named fields, must be in this order
 ```
 
-Changing the color of a pixel can easily be done like this:
+The above declarations may be a bit lengthy, however, changing the color of a pixel can easily be done like this:
 
 ```code
 PixelColor myPixel = neopixelBlack;
@@ -104,20 +87,36 @@ npx.setPixel(0, neopixelRed);             // set first to Red
 npx.show();                               // show it on the Neopixels
 ```
 
-## Examples and Documentation
+## Examples
 
-Please refer to the "examples" and "docs" folders in this driver.
+The `examples` folder contains demos for the `ESP-IDF` and `pioarduino` environment.
 
-## @@@TODO topics
+Each environment contains a README.md file, explaning how to build in general.
 
-Installation
-Quick start
-PixelType
-RGB vs RGBW
-SEQ3 vs SEQ4
-Brightness
-show() behavior
-Memory usage
-Supported chips
-ESP-IDF version
-pioArduino example
+### ESP-IDF
+
+- Blink - blink one Neopixel (and one classic LED)
+- Chaser - run Neopixels one afer another
+
+More examples in `pioarduino`, you can adapt them yourself to run in the ESP-IDF environment.
+
+### pioarduino
+
+- Blink - blink one Neopixel (and one classic LED)
+- Chaser - run Neopixels one afer another
+- Rainbow - all colors distributed over the Neopixels, slowly shifting/turning by recalculation and by in-memory rotation
+- Range - filling and rotating a part of the Neopixels only
+
+## Documentation
+
+The folder `documentation` contains detailed information on I2S, the SEQ/SEQ4 timing, choosing the right PixelType and about the wiring.
+
+## Development (dev) folder
+
+This repository is an ESP-IDF **_component_** (aka: library).
+
+For development purposes, the `dev` folder contains the ESP-IDF environment to build a Test Program. The repository root `CMakeLists.txt` supports direct ESP-IDF commands from this workspace while still acting as a reusable component when included elsewhere. This way, the component can easily be tested without having a separate (example) program.
+
+See the README.md in the `dev` folder on how to use it.
+
+Initially, VSC may show #include errors and missing settings in the .vscode files. These will be solved automatically while building the Test Program.
