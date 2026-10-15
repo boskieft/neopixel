@@ -1,8 +1,8 @@
 /*
 ***************************************************************************************************
-    Example of using the ESP32xx Neopixel Driver on Pioarduino: Chaser animation
+    Example of using the ESP32xx Neopixel Driver on pioarduino: Chaser animation
 
-    The Neopixels will be lit one after each other
+    The Neopixels will be lit one after another.
 
     Copyright (c) 2026 Erik Boskieft. All rights reserved.
     Released under the MIT License, see the LICENSE file for details.

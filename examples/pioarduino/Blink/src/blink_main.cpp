@@ -1,6 +1,6 @@
 /*
 ***************************************************************************************************
-    Example of using the ESP32xx Neopixel Driver on Pioarduino: Blink animation
+    Example of using the ESP32xx Neopixel Driver on pioarduino: Blink animation
 
     Blink both the Status LED (on standard GPIO) and one Neopixel at the same time.
 

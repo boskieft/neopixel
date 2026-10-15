@@ -134,7 +134,7 @@ bool NeopixelDriver<Mode>::setPixel(
 
     if (brightness != 255) {
         //---------------------------------------
-        //  Apply global brighness
+        //  Apply global brightness
         //---------------------------------------
         if (pixel.color.r)
             pixel.color.r = (pixel.color.r * brightness) >> 8;

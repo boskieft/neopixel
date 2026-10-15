@@ -1,6 +1,6 @@
 /*
 ***************************************************************************************************
-    Example of using the ESP32xx Neopixel Driver on Pioarduino: Rainbow animation
+    Example of using the ESP32xx Neopixel Driver on pioarduino: Rainbow animation
 
     Rainbow colors will be shifted (strip) / rotated (ring) across the Neopixels.
     Two methods are demonstrated: recalculating each frame and just rotating the pixels.

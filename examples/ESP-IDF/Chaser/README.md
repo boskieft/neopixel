@@ -1,6 +1,6 @@
 # Neopixel Chaser Example
 
-This Example demonstrates the Chaser effect: Neopixels are lit one after each other.
+This Example demonstrates the chaser effect: Neopixels are lit one after another.
 Build and run in the `ESP-IDF` environment.
 
 ## Change the GPIO numbers
@@ -13,7 +13,7 @@ The `enablePin` is only needed in case your (74HCT126) level shifter has an Enab
 
 See the generic instructions in the neopixel/examples/ESP-IDF/README.md
 
-The Neopixels will be lit one after each other.
+The Neopixels will be lit one after another.
 
 The VSC Terminal will show logging like this:
 

@@ -1,6 +1,6 @@
 /*
 ***************************************************************************************************
-    Example of using the ESP32xx Neopixel Driver on Pioarduino: Range animation
+    Example of using the ESP32xx Neopixel Driver on pioarduino: Range animation
 
     Demonstrate filling a pixel range in one half (2 quadrants)
     and running the Chaser (using rotate) in the other half.
