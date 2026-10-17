@@ -128,7 +128,7 @@ bool animateRanges(unsigned long currentMillis) {
     static const size_t startIndexQ3 = (2 * nrNeopixels) / 4;
     static const size_t startIndexQ4 = (3 * nrNeopixels) / 4;
 
-    static PixelColor dimmedWhite = {.color = {.b = 0x20, .g = 0x20, .r = 0x20, .w = 0}};
+    static PixelColor dimmedWhite = MakePixelColor(0x20, 0x20, 0x20);
     static int animationStatus = 0;
     static unsigned long timeoutMillis = 0;
 

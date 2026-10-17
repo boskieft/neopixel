@@ -20,11 +20,7 @@
 ===================================================================================================
     Union PixelColor
 
-    Can be used as one 32-bit value,
-    or by addressing the four individual r, g, b, w bytes
-    (for examples see primary colors below)
-
-    In case of GRB, keep the white component = 0
+    Can be used as one 32-bit value, or by addressing the four individual r, g, b, w bytes
 ===================================================================================================
 */
 typedef union alignas(uint32_t) UnionPixelColor {
@@ -38,16 +34,68 @@ typedef union alignas(uint32_t) UnionPixelColor {
     } color;
 } PixelColor;
 
-// Primary colors at full brightness
-inline constexpr PixelColor neopixelBlack = {.value = 0x00000000};
-inline constexpr PixelColor neopixelWhite_RGB = {.color = {.b = 0xff, .g = 0xff, .r = 0xff, .w = 0}};
-inline constexpr PixelColor neopixelWhite_RGBW = {.color = {.b = 0, .g = 0, .r = 0, .w = 0xff}};
-inline constexpr PixelColor neopixelRed = {.color = {.b = 0, .g = 0, .r = 0xff, .w = 0}};
-inline constexpr PixelColor neopixelGreen = {.color = {.b = 0, .g = 0xff, .r = 0, .w = 0}};
-inline constexpr PixelColor neopixelBlue = {.color = {.b = 0xff, .g = 0, .r = 0, .w = 0}};
-inline constexpr PixelColor neopixelCyan = {.color = {.b = 0xff, .g = 0xff, .r = 0, .w = 0}};
-inline constexpr PixelColor neopixelMagenta = {.color = {.b = 0xff, .g = 0, .r = 0xff, .w = 0}};
-inline constexpr PixelColor neopixelYellow = {.color = {.b = 0, .g = 0xff, .r = 0xff, .w = 0}};
+/*
+===================================================================================================
+    Shorthands for using PixelColor
+
+    To avoid the somewhat complex syntax of addressing the PixelColor structure directly
+===================================================================================================
+*/
+//-----------------------------------------------------------------------------
+//  PixelColor myColor = MakePixelColor(0xff, 0, 0); // R, G, B (W) order
+//
+//  is the short hand for:
+//  PixelColor myColor = {.color = {.b = 0, .g = 0, .r = 0xff, .w = 0}};
+//-----------------------------------------------------------------------------
+__attribute__((always_inline)) static inline constexpr PixelColor MakePixelColor(uint8_t r, uint8_t g, uint8_t b, uint8_t w = 0) {
+    return PixelColor{
+        .color = {.b = b, .g = g, .r = r, .w = w}};
+}
+
+//-----------------------------------------------------------------------------
+//  PixelColor myColor = MakePixelColor(0x00100000)  // (W)RGB order
+//
+//  is the short hand for:
+//  PixelColor myColor = {.value = 0x00100000};
+//-----------------------------------------------------------------------------
+__attribute__((always_inline)) static inline constexpr PixelColor MakePixelColor(uint32_t colorCode) {
+    return PixelColor{.value = colorCode};
+}
+
+//-----------------------------------------------------------------------------
+//  if (myColorA == myColorB) {}
+//
+//  is the shorthand for:
+//  if (myColorA.value == myColorB.value) {}
+//-----------------------------------------------------------------------------
+__attribute__((always_inline)) static inline constexpr bool operator==(PixelColor a, PixelColor b) {
+    return a.value == b.value;
+}
+
+//-----------------------------------------------------------------------------
+//  if (IsBlack(myColor)) {}
+//
+//  is the shorthand for:
+//  if (myColor.value == 0) {}
+//-----------------------------------------------------------------------------
+__attribute__((always_inline)) static inline constexpr bool IsBlack(PixelColor c) {
+    return c.value == 0;
+}
+
+/*
+===================================================================================================
+    Primary colors at full brightness
+===================================================================================================
+*/
+inline constexpr PixelColor neopixelBlack = MakePixelColor(0);
+inline constexpr PixelColor neopixelWhite_RGB = MakePixelColor(0xff, 0xff, 0xff);
+inline constexpr PixelColor neopixelWhite_RGBW = MakePixelColor(0, 0, 0, 0xff);
+inline constexpr PixelColor neopixelRed = MakePixelColor(0xff, 0, 0);
+inline constexpr PixelColor neopixelGreen = MakePixelColor(0, 0xff, 0);
+inline constexpr PixelColor neopixelBlue = MakePixelColor(0, 0, 0xff);
+inline constexpr PixelColor neopixelCyan = MakePixelColor(0, 0xff, 0xff);
+inline constexpr PixelColor neopixelMagenta = MakePixelColor(0xff, 0, 0xff);
+inline constexpr PixelColor neopixelYellow = MakePixelColor(0xff, 0xff, 0);
 
 /*
 ===================================================================================================

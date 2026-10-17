@@ -112,7 +112,8 @@ void loop(void) {
     static const size_t startIndexQ2 = (1 * nrNeopixels) / 4;
     static const size_t startIndexQ3 = (2 * nrNeopixels) / 4;
     static const size_t startIndexQ4 = (3 * nrNeopixels) / 4;
-    static PixelColor dimmedWhite = {.color = {.b = 0x20, .g = 0x20, .r = 0x20, .w = 0}};
+
+    static PixelColor dimmedWhite = MakePixelColor(0x20, 0x20, 0x20);
     static const int delayMillis = 1000; // for better UX
 
     //---------------------------------
