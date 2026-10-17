@@ -14,7 +14,7 @@ Copy/Clone the files from an example (e.g. examples\ESP-IDF\Blink) into a local 
 
 VSC -> File -> Open Folder...
 
-* Browse and use [Select folder]
+* Browse and click [Select folder]
 
 In VSC Explorer, the minimum file structure for an example should look similar to this:
 
@@ -39,7 +39,7 @@ You may also get a VSC popup [Scan for kits] to set the compiler.
 
 You can ignore all this, it will be solved in the next step: Configure.
 
-## NOTE on waiting!
+## NOTE on waiting(!)
 
 Do WAIT until the message `Waiting for ESP-IDF to setup CMake...` has disappeared from the VSC blue bottom row.
 
@@ -177,14 +177,11 @@ The software will be flashed to the ESP32xx device, a hard reset with the RTS pi
 --- Warning: GDB cannot open serial ports accessed as COMx
 --- Using \\.\COM10 instead...
 --- esp-idf-monitor 1.9.0 on \\.\COM10 115200
---- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H
-I (101) esp_image: segment 3: paddr=00020020 vaddr=42000020 sizeESP-ROM:esp32c3-api1-20210207
-Build:Feb  7 2021
+...
 rst:0x15 (USB_UART_CHIP_RESET),boot:0xf (SPI_FAST_FLASH_BOOT)
 ...
-
 I (24) boot: ESP-IDF v6.1 2nd stage bootloader
-I (24) boot: compile time Oct 10 2026 22:43:54
+I (24) boot: compile time Oct 17 2026 16:11:13
 I (25) boot: chip revision: v0.4
 I (25) boot: efuse block revision: v1.3
 I (28) boot.esp32c3: SPI Speed      : 80MHz
@@ -192,31 +189,28 @@ I (32) boot.esp32c3: SPI Mode       : DIO
 ...
 I (145) cpu_start: Unicore app
 I (153) cpu_start: GPIO 20 and 21 are used as console UART I/O pins
-I (154) cpu_start: Pro cpu start user code
-I (154) cpu_start: cpu freq: 160000000 Hz
+I (153) cpu_start: Pro cpu start user code
+I (153) cpu_start: cpu freq: 160000000 Hz
 I (158) app_init: Application information:
 I (163) app_init: Project name:     ESP-IDF-blink
 I (168) app_init: App version:      1
-I (173) app_init: Compile time:     Oct 10 2026 22:43:40
-I (179) app_init: ELF file SHA256:  a9b13f017...
-I (184) app_init: ESP-IDF:          v6.1
+I (172) app_init: Compile time:     Oct 17 2026 16:10:55
 ...
-I (274) main_task: Started on CPU0
-I (274) main_task: Calling app_main()
-I (3274) BLINK: Status LED on GPIO=8
-I (3274) BLINK: Switching On enablePin=10
-I (3274) BLINK: Starting the Neopixel driver on pin=5 with 1 pixels
-D (3274) NPIX: GRB Neopixels, seq3 timing
-D (3274) I2S_: Big-Endian buffer
-D (3284) I2S_: Raw data size=9 bytes, bitRate=2400000 bps
-D (3284) I2S_: Optimised buffer size=32 bytes, frames/chunk=8, bytes/frame=4, DMA chunks=2
-D (3294) I2S_: Sample rate=75000 frames/sec
-D (3304) I2S_: Interrupt priority=0
-I (3304) I2S_: Started I2S channel=0, internal DMA buffer size=64 bytes, required transmit time=213 us
-D (3314) I2S_: Starting separate Task for Transmit Control on core=0, priority=2
-D (3324) I2S_: maxSendMicros=195
-I (3324) BLINK: Start the Blink animation
-```
+I (273) main_task: Started on CPU0
+I (273) main_task: Calling app_main()
+I (3273) BLINK: ----- Startup, chip=`esp32c3` -----
+I (3273) NPIX: Beginning the Neopixel Driver on dataPin=5 with 1 Neopixels
+D (3273) NPIX: GRB Neopixels, seq3 timing
+D (3273) I2S_: Big-Endian buffer
+D (3273) I2S_: Raw data size=9 bytes, bitRate=2400000 bps
+D (3283) I2S_: Optimised buffer size=32 bytes, frames/chunk=8, bytes/frame=4, DMA chunks=2
+D (3293) I2S_: Sample rate=75000 frames/sec
+D (3293) I2S_: Interrupt priority=0
+I (3303) I2S_: Started I2S channel=0, internal DMA buffer size=64 bytes, required transmit time=213 us
+D (3313) I2S_: Starting separate Task for Transmit Control on core=0, priority=2
+D (3313) I2S_: maxSendMicros=205
+I (3323) BLINK: Start the Blink animation
+...
 
 The `BLINK` log lines comes from the Blink example itself, more logging can follow.
 

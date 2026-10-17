@@ -14,40 +14,30 @@
 ***************************************************************************************************
 */
 #include <Arduino.h>
-#include "set_gpio.h" // comment-out to define the GPIO pins manually below
 #include "neopixel.h"
 
 static const char *TAG = "RANGE"; // for ESP_LOGx() logging
 
-#ifndef SET_GPIO_H
-// instead of using "set_gpio.h" you can also set the GPIO pins manually here
-static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of the Neopixels (via 74HCT126 level shifter)
-static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enable the 74HCT126 level shifter
-#endif
+/*
+===============================================================================
+    Neopixel Configuration, adjust as needed for your own hardware setup
+===============================================================================
+*/
+static const gpio_num_t dataPin = GPIO_NUM_5; // output data pin to DI of the Neopixels
+static const size_t nrNeopixels = 24;         // nr of Neopixels to drive (at least 12 for a nice animation)
+NeopixelDriver<PixelType::GRB_SEQ3> npx;      // 3 colors (no white) in the usual GRB order, SEQ3 timing
 
 /*
 ===============================================================================
     Start the Neopixel Driver
 ===============================================================================
 */
-static const size_t nrNeopixels = 24; // nr of Neopixels to drive
-NeopixelDriver<PixelType::GRB_SEQ3> npx;
-
 void setup(void) {
     // Logging
     esp_log_level_set("*", ESP_LOG_DEBUG); // enable ESP_LOGD debug messages
     delay(3000);                           // wait for Platformio monitor to connect
 
     ESP_LOGI(TAG, "----- Running setup, chip=`%s` -----", CONFIG_IDF_TARGET);
-
-    // Optional: set Enable output to High
-    if (enablePin != GPIO_NUM_NC) {
-        ESP_LOGI(TAG, "Switching On enablePin=%d", enablePin);
-        pinMode(enablePin, OUTPUT);
-        digitalWrite(enablePin, HIGH);
-    } else {
-        ESP_LOGI(TAG, "Optional enablePin is NOT configured (pin = %d)", enablePin);
-    }
 
     // Start the Neopixel Driver
     if (!npx.begin(nrNeopixels, dataPin)) {
@@ -78,10 +68,11 @@ void setup(void) {
 *******************************************************************************
 */
 static void chaserInRange(size_t startIndex, size_t endIndex) {
-    static const size_t nrRotates = 3 * (nrNeopixels / 2) - 1; // 3 full rotations, end with last pixel in range
-    static const int delayMillis = 200;                        // for visibility
+    static const size_t nrRotations = 3 * (nrNeopixels / 2) - 3; // 3 full rotations, end with the 3 pixels back in start position
 
-    // Start position
+    static const int delayMillis = 200; // for visibility
+
+    // Set 3 pixels at the start position
     npx.setPixel(startIndex, neopixelBlue);
     npx.setPixel(startIndex + 1, neopixelGreen);
     npx.setPixel(startIndex + 2, neopixelRed); // on start this is the front pixel
@@ -93,13 +84,13 @@ static void chaserInRange(size_t startIndex, size_t endIndex) {
 
     for (int i = 0; i < 1; i++) {
         // Rotate Right (i.e. in the direction of increasing pixel indices)
-        for (int j = 0; j < nrRotates; j++) {
+        for (int j = 0; j < nrRotations; j++) {
             delay(delayMillis);
             npx.rotateRangeRight(startIndex, endIndex);
             npx.show();
         }
         // Rotate Left
-        for (int j = 0; j < nrRotates; j++) {
+        for (int j = 0; j < nrRotations; j++) {
             delay(delayMillis);
             npx.rotateRangeLeft(startIndex, endIndex);
             npx.show();

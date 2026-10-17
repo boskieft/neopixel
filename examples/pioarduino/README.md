@@ -2,7 +2,7 @@
 
 The PlatformIO variant `pioarduino` can be used to build and test an example from this folder.
 
-NOTE: the original `PlatformIO` cannot be used with Arduino anymore, because PlatformIO ceased support years ago. The old version is still available, but does not work with recent ESP-IDF v5 and up (v5.5.5 is required for the Neopixel Driver).
+NOTE: the **_original_** `PlatformIO` cannot be used with Arduino anymore, because PlatformIO ceased support years ago. The old version is still available, but does not work with recent ESP-IDF v5 and up (v5.5.5 is required for the Neopixel Driver).
 
 ## Software required
 
@@ -15,7 +15,6 @@ NOTE: when using the `pioarduino` extension, make sure you don't have the origin
 Copy/clone the files from an example (e.g. examples\pioarduino\Chaser) into a local project folder, e.g. `<YourPath>\pio-chaser`
 
 * folder: examples\pioarduino\Chaser\src -> \<YourPath\>\pio-chaser\src
-* file: examples\pioarduino\set_gpio.h -> \<YourPath\>\pio-chaser\src
 * file: examples\pioarduino\platformio.ini -> \<YourPath\>\pio-chaser
 
 The minimal file structure looks like this:
@@ -24,7 +23,6 @@ The minimal file structure looks like this:
 pio-chaser
 |-- src
 |    |-- chaser_main.cpp
-|    |-- set_gpio.h
 |
 |-- platformio.ini
 ```
@@ -35,7 +33,7 @@ VSC -> File -> Open Folder...
 
 * Browse and use [Select folder]
 
-Once opened, pioarduino will start setting up the environment automatically.
+Once opened, `pioarduino` will start setting up the environment automatically.
 After  a short while, the file structure is expanded to this:
 
 ```code
@@ -49,7 +47,6 @@ pio-chaser
 |
 |-- src
 |    |-- chaser_main.cpp
-|    |-- set_gpio.h
 |
 |-- .gitignore
 |-- platformio.ini
@@ -57,15 +54,16 @@ pio-chaser
 
 ## ESP32xx variants, GPIO numbers
 
-The file `platformio.ini` contains my (Erik's) ESP32xx variants and their boards. You can change this to suit your needs. Make sure the `[env:esp32xx]` lowercase names match the `CONFIG_IDF_TARGET_ESP32xx` uppercase names in `set_gpio.h`.
+The file `platformio.ini` contains my (Erik's) ESP32xx variants and their boards. You can change this to suit your needs.
 
-The file `set_gpio.h` sets the correct GPIO pin numbers, based on the selected esp32xx chip in VSC, pioarduino -> Project Tasks (see Build paragraph below). This is especially convenient when working with multiple ESP32xx variants.
+The used GPIO pin to drive the Neopixels is configured at the top of the program file for my personal hardware setup. Most probably you have to change it your own situation. The example needs at least 12 Neopixels for a nice animation.
 
-NOTE: the GPIO pin(s) depend on the used ESP32xx chip and the hardware circuit around it. Most probably you have to change it for your situation. You can do this in `set_gpio.h`, or directly in the example *.cpp file (and comment out the #include of `set_gpio.h`):
+## Difference with the examples for the ESP-IDF environment
 
-* `dataPin` is mandatory; it is the output data pin towards the digital input (DI) of the Neopixels (possibly via a 74HCT126 level shifter).
-* `enablePin` is only needed if your (74HCT126) level shifter has an Enable input that needs to be driven by your ESP32xx chip. Otherwise set `enablePin = GPIO_NUM_NC`.
-* `statusLedPin` is also optional; it can be used, for example, in the Blink example to drive the classic on/off status LED as well. If you don't need it, set `statusLedPin = GPIO_NUM_NC`.
+The `pioarduino` examples are on purpose a bit more basic than the ones for the ESP-IDF environment:
+
+* The ESP-IDF examples use a mechanism that selects the predefined GPIO number based on the selected esp32xx chip. This is espacially handy in case you often change the used ESP32xx module. To keep it simple here, the `pioarduino` examples do not have this mechanism, you have to edit the program file instead.
+* The ESP-IDF examples can also switch On the optional Enable output at startup. If you need it here after all, you can easily add it yourself in the setup().
 
 ## pioarduino version
 
@@ -177,7 +175,7 @@ Next, VSC will switch automatically to the [ESP Decoder] tab
 
 ## Upload error?
 
-In case you accidently selected the wrong `Project Task -> esp32xx` variant, the firmware cannot be uploaded and you get an error as shown below. Just use the right esp32xx variant instead (`esp32c3` in this case).
+In case you accidently selected another `Project Task -> esp32xx` variant than you actually are using, the firmware cannot be uploaded and you get an error as shown below. Just use the right esp32xx variant instead (`esp32c3` in this case).
 
 ```code
 A fatal error occurred: This chip is ESP32-C3, not ESP32-S3. Wrong chip argument?
@@ -214,7 +212,7 @@ Partitions Info:
   ...
 Software Info:
 ------------------------------------------
-  Compile Date/Time : Oct 10 2026 21:41:08
+  Compile Date/Time : Oct 16 2026 21:41:08
   ESP-IDF Version   : v5.5.5
   Arduino Version   : 3.3.11
 ------------------------------------------
@@ -228,20 +226,18 @@ Board Info:
   Arduino USB Mode  : 1
   CDC On Boot       : 1
 ============ Before Setup End ============
-I (3259) CHASER: ----- Running setup, chip=`esp32c3` -----
-I (3259) CHASER: Using dataPin=5
-I (3259) CHASER: Switching On enablePin=10
-I (3263) CHASER: Init the Neopixels on pin=5 with 24 pixels
-D (3269) NPIX: GRB Neopixels, seq3 timing
-D (3273) I2S_: Big-Endian buffer
-D (3276) I2S_: Raw data size=216 bytes, bitRate=2400000 bps
-D (3282) I2S_: Optimised buffer size=216 bytes, frames/chunk=54, bytes/frame=4, DMA chunks=2
-D (3290) I2S_: Sample rate=75000 frames/sec
-D (3295) I2S_: Interrupt priority=0
-I (3298) I2S_: Started I2S channel=0, internal DMA buffer size=432 bytes, required transmit time=1440 us
-D (3308) I2S_: Starting separate Task for Transmit Control on core=0, priority=2
-D (3316) I2S_: maxSendMicros=133
-I (3319) CHASER: Start the Chaser animation
+I (6924) CHASER: ----- Running setup, chip=`esp32c3` -----
+I (6924) NPIX: Beginning the Neopixel Driver on dataPin=5 with 24 Neopixels
+D (6927) NPIX: GRB Neopixels, seq3 timing
+D (6931) I2S_: Big-Endian buffer
+D (6934) I2S_: Raw data size=216 bytes, bitRate=2400000 bps
+D (6940) I2S_: Optimised buffer size=216 bytes, frames/chunk=54, bytes/frame=4, DMA chunks=2
+D (6948) I2S_: Sample rate=75000 frames/sec
+D (6953) I2S_: Interrupt priority=0
+I (6956) I2S_: Started I2S channel=0, internal DMA buffer size=432 bytes, required transmit time=1440 us
+D (6966) I2S_: Starting separate Task for Transmit Control on core=0, priority=2
+D (6974) I2S_: maxSendMicros=144
+I (6977) CHASER: Start the Chaser animation
 =========== After Setup Start ============
 INTERNAL Memory Info:
   ...

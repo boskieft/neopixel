@@ -8,38 +8,30 @@
     Released under the MIT License, see the LICENSE file for details.
 ***************************************************************************************************
 */
-#include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "driver/gpio.h"
 #include "esp_log.h"
+#include "driver/gpio.h"
+
 #include "neopixel.h"
 
 static const char *TAG = "CHASER"; // for ESP_LOGx() logging
 
 /*
------------------------------------------------------------
-    GPIO pins -> Adapt to your hardware configuration !
------------------------------------------------------------
+===============================================================================
+    Neopixel Configuration, adjust as needed for your own hardware setup
+===============================================================================
 */
-// My ESP32-C3 config
-static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enable the 74HCT126 level shifter
-static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of the Neopixels (via 74HCT126 level shifter)
-static const size_t nrNeopixels = 24;            // nr of Neopixels to drive
+static const gpio_num_t dataPin = GPIO_NUM_5; // output data pin to DI of the Neopixels
+static const size_t nrNeopixels = 24;         // number of Neopixels to drive
+NeopixelDriver<PixelType::GRB_SEQ3> npx;      // 3 colors (no white) in the usual GRB order, SEQ3 timing
 
-NeopixelDriver<PixelType::GRB_SEQ3> npx;
-
+/*
+-------------------------------------------------------------------------------
+    Start the Neopixel Driver
+-------------------------------------------------------------------------------
+*/
 void startNeopixel(void) {
-    // Optional: Enable the level shifter
-    if (enablePin != GPIO_NUM_NC) {
-        ESP_LOGI(TAG, "Switching On enablePin=%d", enablePin);
-        gpio_set_direction(enablePin, GPIO_MODE_OUTPUT);
-        gpio_set_level(enablePin, 1);
-    } else {
-        ESP_LOGI(TAG, "Optional enablePin is NOT configured (pin = %d)", enablePin);
-    }
-
-    // Start the Neopixel Driver
     if (!npx.begin(nrNeopixels, dataPin)) {
         ESP_LOGE(TAG, "STOPPED: Failed to start the Neopixel Driver");
         for (;;) {
@@ -53,6 +45,13 @@ void startNeopixel(void) {
     npx.brightness = 0x10;           // medium brightness
 }
 
+/*
+-------------------------------------------------------------------------------
+    Chaser animation
+
+    Lights one Neopixel at a time in a chasing sequence.
+-------------------------------------------------------------------------------
+*/
 void chaserAnimation(void) {
     static int coloredIndex = 0;
     static int blackIndex = nrNeopixels - 1;
@@ -69,9 +68,9 @@ void chaserAnimation(void) {
 }
 
 /*
-***********************************************************
+*******************************************************************************
     Main
-***********************************************************
+*******************************************************************************
  */
 extern "C" void app_main(void) {
     // Increase logging for this program, the Neopixel Driver and the I2S subsystem.

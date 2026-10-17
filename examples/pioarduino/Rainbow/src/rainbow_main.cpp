@@ -10,40 +10,30 @@
 ***************************************************************************************************
 */
 #include <Arduino.h>
-#include "set_gpio.h" // comment-out to define the GPIO pins manually below
 #include "neopixel.h"
 
 static const char *TAG = "RAINBOW"; // for ESP_LOGx() logging
 
-#ifndef SET_GPIO_H
-// instead of using "set_gpio.h" you can also set the GPIO pins manually here
-static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of the Neopixels (via 74HCT126 level shifter)
-static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enable the 74HCT126 level shifter
-#endif
+/*
+===============================================================================
+    Neopixel Configuration, adjust as needed for your own hardware setup
+===============================================================================
+*/
+static const gpio_num_t dataPin = GPIO_NUM_5; // output data pin to DI of the Neopixels
+static const size_t nrNeopixels = 24;         // nr of Neopixels to drive
+NeopixelDriver<PixelType::GRB_SEQ3> npx;      // 3 colors (no white) in the usual GRB order, SEQ3 timing
 
 /*
 ===============================================================================
     Start the Neopixel Driver
 ===============================================================================
 */
-static const size_t nrNeopixels = 24; // nr of Neopixels to drive
-NeopixelDriver<PixelType::GRB_SEQ3> npx;
-
 void setup(void) {
     // Logging
     esp_log_level_set("*", ESP_LOG_DEBUG); // enable ESP_LOGD debug messages
     delay(3000);                           // wait for Platformio monitor to connect
 
     ESP_LOGI(TAG, "----- Running setup, chip=`%s` -----", CONFIG_IDF_TARGET);
-
-    // Optional: set Enable output to High
-    if (enablePin != GPIO_NUM_NC) {
-        ESP_LOGI(TAG, "Switching On enablePin=%d", enablePin);
-        pinMode(enablePin, OUTPUT);
-        digitalWrite(enablePin, HIGH);
-    } else {
-        ESP_LOGI(TAG, "Optional enablePin is NOT configured (pin = %d)", enablePin);
-    }
 
     // Start the Neopixel Driver
     if (!npx.begin(nrNeopixels, dataPin)) {
@@ -116,6 +106,7 @@ void rainbow(
     Main
 *******************************************************************************
  */
+// Set the delay times in such way that the animation speed of both methods is the same
 #define RECALCULATE_METHOD_DELAY_MS (50)
 #define ROTATE_METHOD_DELAY_MS ((RECALCULATE_METHOD_DELAY_MS * 256) / nrNeopixels) // Use same pixel speed for the rotating method
 

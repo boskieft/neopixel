@@ -8,67 +8,30 @@
     Released under the MIT License, see the LICENSE file for details.
 ***************************************************************************************************
 */
-#include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "driver/gpio.h"
 #include "esp_log.h"
+#include "driver/gpio.h"
+
 #include "neopixel.h"
 
 static const char *TAG = "BLINK"; // for ESP_LOGx() logging
 
 /*
------------------------------------------------------------
-    GPIO pins -> Adapt to your hardware configuration !
------------------------------------------------------------
+===============================================================================
+    Neopixel Configuration, adjust as needed for your own hardware setup
+===============================================================================
 */
-// My ESP32-C3 config
-static const gpio_num_t statusLedPin = GPIO_NUM_8; // output pin to drive the classic on/off Status LED
-
-static const gpio_num_t enablePin = GPIO_NUM_10; // optional output pin to enable the 74HCT126 level shifter
-static const gpio_num_t dataPin = GPIO_NUM_5;    // output data pin to DI of the Neopixels (via 74HCT126 level shifter)
+static const gpio_num_t dataPin = GPIO_NUM_5; // output data pin to DI of the Neopixels
+static const size_t nrNeopixels = 1;          // just one (1) Neopixel to drive
+NeopixelDriver<PixelType::GRB_SEQ3> npx;      // 3 colors (no white) in the usual GRB order, SEQ3 timing
 
 /*
------------------------------------------------------------
-    Classic on/off Status LED
------------------------------------------------------------
+===============================================================================
+    Start the Neopixel Driver
+===============================================================================
 */
-static void configureStatusLed(void) {
-
-    if (statusLedPin != GPIO_NUM_NC) {
-        ESP_LOGI(TAG, "Status LED on GPIO=%d", statusLedPin);
-        gpio_reset_pin(statusLedPin);
-        gpio_set_direction(statusLedPin, GPIO_MODE_OUTPUT);
-    } else {
-        ESP_LOGW(TAG, "Status LED pin is NOT configured (pin = %d), Status LED will not blink", statusLedPin);
-    }
-}
-
-static void blinkStatusLed(bool isOn) {
-    if (statusLedPin != GPIO_NUM_NC) {
-        gpio_set_level(statusLedPin, !isOn); // LED is active low
-    }
-}
-
-/*
------------------------------------------------------------
-    Neopixel LED
------------------------------------------------------------
-*/
-NeopixelDriver<PixelType::GRB_SEQ3> npx;
-static const size_t nrNeopixels = 1; // just one (1) pixel for this example
-
 void startNeopixel(void) {
-    // Optional: Enable the level shifter
-    if (enablePin != GPIO_NUM_NC) {
-        ESP_LOGI(TAG, "Switching On enablePin=%d", enablePin);
-        gpio_set_direction(enablePin, GPIO_MODE_OUTPUT);
-        gpio_set_level(enablePin, 1);
-    } else {
-        ESP_LOGI(TAG, "Optional enablePin is NOT configured (pin = %d)", enablePin);
-    }
-
-    // Start the Neopixel Driver
     if (!npx.begin(nrNeopixels, dataPin)) {
         ESP_LOGE(TAG, "STOPPED: Failed to start the Neopixel Driver");
         for (;;) {
@@ -82,19 +45,10 @@ void startNeopixel(void) {
     npx.brightness = 0x10;           // medium brightness
 }
 
-void blinkNeopixel(bool isOn) {
-    if (isOn) {
-        npx.setPixel(0, neopixelRed);
-    } else {
-        npx.setPixel(0, neopixelBlack);
-    }
-    npx.show();
-}
-
 /*
-***********************************************************
+*******************************************************************************
     Main
-***********************************************************
+*******************************************************************************
  */
 extern "C" void app_main(void) {
     // Increase logging for this program, the Neopixel Driver and the I2S subsystem.
@@ -105,7 +59,6 @@ extern "C" void app_main(void) {
     vTaskDelay(3000 / portTICK_PERIOD_MS); // allow Terminal to connect
 
     ESP_LOGI(TAG, "----- Startup, chip=`%s` -----", CONFIG_IDF_TARGET);
-    configureStatusLed();
     startNeopixel();
 
     bool isOn = true;
@@ -113,11 +66,14 @@ extern "C" void app_main(void) {
     ESP_LOGI(TAG, "Start the Blink animation");
 
     while (1) {
-        blinkStatusLed(isOn);
-        blinkNeopixel(isOn);
+        if (isOn) {
+            npx.setPixel(0, neopixelRed);
+        } else {
+            npx.setPixel(0, neopixelBlack);
+        }
+        npx.show();
 
-        /* Toggle the LED state */
-        isOn = !isOn;
-        vTaskDelay(100 / portTICK_PERIOD_MS);
+        isOn = !isOn;                         // toggle for next iteration
+        vTaskDelay(100 / portTICK_PERIOD_MS); // for visibility, wait [ms] before the next iteration
     }
 }
