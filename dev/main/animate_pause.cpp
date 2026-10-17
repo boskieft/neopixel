@@ -23,7 +23,7 @@ static const char *TAG = "PAUSE";
 *******************************************************************************
 */
 bool animatePause(unsigned long currentMillis) {
-    static PixelColor dimmedBlue = MakePixelColor(0, 0, 0x20);
+    static PixelColor dimmedBlue = makePixelColor(0, 0, 0x20);
     static int animationStatus = 0;
     static unsigned long timeoutMillis = 0;
 

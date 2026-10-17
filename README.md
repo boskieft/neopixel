@@ -59,11 +59,11 @@ rotateRangeRight(start, end);     // rotate the range[start,end] of pixels in th
 
 The color of a pixel is stored in a `PixelColor` variable that contains the Red, Green, Blue and (optionally) White components.
 
-The `MakePixelColor` shorthands can be used to declare a color variable easily:
+The `makePixelColor` shorthand can be used to declare a color variable easily:
 
 ```code
-PixelColor red = MakePixelColor(0xff0000);      // 0x(ww)rrggbb order
-PixelColor green = MakePixelColor(0, 0xff, 0);  // R, G, B (,W) order
+PixelColor red = makePixelColor(0xff0000);      // 0x(ww)rrggbb order
+PixelColor green = makePixelColor(0, 0xff, 0);  // R, G, B (,W) order
 ```
 
 For changing an existing color, the color or value fields can be used:

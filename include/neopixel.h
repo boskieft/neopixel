@@ -42,23 +42,23 @@ typedef union alignas(uint32_t) UnionPixelColor {
 ===================================================================================================
 */
 //-----------------------------------------------------------------------------
-//  PixelColor myColor = MakePixelColor(0xff, 0, 0); // R, G, B (W) order
+//  PixelColor myColor = makePixelColor(0xff, 0, 0); // R, G, B (W) order
 //
 //  is the short hand for:
 //  PixelColor myColor = {.color = {.b = 0, .g = 0, .r = 0xff, .w = 0}};
 //-----------------------------------------------------------------------------
-__attribute__((always_inline)) static inline constexpr PixelColor MakePixelColor(uint8_t r, uint8_t g, uint8_t b, uint8_t w = 0) {
+__attribute__((always_inline)) static inline constexpr PixelColor makePixelColor(uint8_t r, uint8_t g, uint8_t b, uint8_t w = 0) {
     return PixelColor{
         .color = {.b = b, .g = g, .r = r, .w = w}};
 }
 
 //-----------------------------------------------------------------------------
-//  PixelColor myColor = MakePixelColor(0x00100000)  // (W)RGB order
+//  PixelColor myColor = makePixelColor(0x00100000)  // (W)RGB order
 //
 //  is the short hand for:
 //  PixelColor myColor = {.value = 0x00100000};
 //-----------------------------------------------------------------------------
-__attribute__((always_inline)) static inline constexpr PixelColor MakePixelColor(uint32_t colorCode) {
+__attribute__((always_inline)) static inline constexpr PixelColor makePixelColor(uint32_t colorCode) {
     return PixelColor{.value = colorCode};
 }
 
@@ -73,12 +73,12 @@ __attribute__((always_inline)) static inline constexpr bool operator==(PixelColo
 }
 
 //-----------------------------------------------------------------------------
-//  if (IsBlack(myColor)) {}
+//  if (isNeopixelBlack(myColor)) {}
 //
 //  is the shorthand for:
 //  if (myColor.value == 0) {}
 //-----------------------------------------------------------------------------
-__attribute__((always_inline)) static inline constexpr bool IsBlack(PixelColor c) {
+__attribute__((always_inline)) static inline constexpr bool isNeopixelBlack(PixelColor c) {
     return c.value == 0;
 }
 
@@ -87,15 +87,15 @@ __attribute__((always_inline)) static inline constexpr bool IsBlack(PixelColor c
     Primary colors at full brightness
 ===================================================================================================
 */
-inline constexpr PixelColor neopixelBlack = MakePixelColor(0);
-inline constexpr PixelColor neopixelWhite_RGB = MakePixelColor(0xff, 0xff, 0xff);
-inline constexpr PixelColor neopixelWhite_RGBW = MakePixelColor(0, 0, 0, 0xff);
-inline constexpr PixelColor neopixelRed = MakePixelColor(0xff, 0, 0);
-inline constexpr PixelColor neopixelGreen = MakePixelColor(0, 0xff, 0);
-inline constexpr PixelColor neopixelBlue = MakePixelColor(0, 0, 0xff);
-inline constexpr PixelColor neopixelCyan = MakePixelColor(0, 0xff, 0xff);
-inline constexpr PixelColor neopixelMagenta = MakePixelColor(0xff, 0, 0xff);
-inline constexpr PixelColor neopixelYellow = MakePixelColor(0xff, 0xff, 0);
+inline constexpr PixelColor neopixelBlack = makePixelColor(0);
+inline constexpr PixelColor neopixelWhite_RGB = makePixelColor(0xff, 0xff, 0xff);
+inline constexpr PixelColor neopixelWhite_RGBW = makePixelColor(0, 0, 0, 0xff);
+inline constexpr PixelColor neopixelRed = makePixelColor(0xff, 0, 0);
+inline constexpr PixelColor neopixelGreen = makePixelColor(0, 0xff, 0);
+inline constexpr PixelColor neopixelBlue = makePixelColor(0, 0, 0xff);
+inline constexpr PixelColor neopixelCyan = makePixelColor(0, 0xff, 0xff);
+inline constexpr PixelColor neopixelMagenta = makePixelColor(0xff, 0, 0xff);
+inline constexpr PixelColor neopixelYellow = makePixelColor(0xff, 0xff, 0);
 
 /*
 ===================================================================================================
