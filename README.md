@@ -9,8 +9,8 @@ Features:
 - **ESP32xx family:** Tested on 5 ESP32xx variants (see paragraph below).
 - **ESP-IDF:** Works on ESP-IDF v5.5.5 and above, with and without the (Pio)Arduino framework.
 - **I2S:** Using the standard I2S driver of ESP-IDF:
-  - DMA for minimal processor load and interrupts
-  - Keeps SPI with DMA available for other purposes
+  - DMA for minimal processor load and interrupts.
+  - Keeps SPI with DMA available for other purposes.
 - **GRB/GRBW:** Configurable for GRB (3 colors) or GRBW (3 colors + white) Neopixels.
 - **SEQ3/SEQ4:** Configurable for best match on your Neopixel's timing:
   - 3 bit sequence, period=1200ns, dutycycle: Off=33%, On=67%
@@ -18,10 +18,10 @@ Features:
 - **1...N:** Drives 1 up to more than 20000 Neopixels (limited by RAM memory and transmission time < 1 sec)
 - **Fast:** Driver waits for transmission completion in separate task.
 - **Easy:** No polling, no throttling, the driver takes care.
-- **Rotate:** In-memory left or right rotation for (a range of) Neopixels
-- **Fill:** In-memory color filling for (a range of) Neopixels
-- **Logging:** Using standard ESP_LOGx(), activate Debug for more
-- **Statistics:** On timing and errors
+- **Rotate:** In-memory left or right rotation for (a range of) Neopixels.
+- **Fill:** In-memory color filling for (a range of) Neopixels.
+- **Logging:** Using standard ESP_LOGx(), activate Debug for more.
+- **Statistics:** On timing and errors.
 
 ## Tested ESP32xx devices
 
@@ -35,7 +35,7 @@ Tested successfully on the ESP32xx devices listed below.
 
 ## Build environment
 
-The driver is written in C++ using the ESP-IDF environment, tested with version 5.5.5 (minimum) and 6.1 (current). It has no dependencies towards pioarduino or Arduino, but can just be used by them.
+The driver is written in C++ using the ESP-IDF environment, tested with version 5.5.5 (minimum) and 6.1 (current). It has no dependencies towards pioarduino or Arduino, but can simply be used by them.
 
 ## Functions
 
@@ -57,16 +57,16 @@ rotateRangeRight(start, end);     // rotate the range[start,end] of pixels in th
 
 ## PixelColor
 
-The color of a pixel is stored in a `PixelColor` variable that contains the R,G,B and (optionally) white components.
+The color of a pixel is stored in a `PixelColor` variable that contains the Red, Green, Blue and (optionally) White components.
 
-It can be declared in two different ways:
+The `MakePixelColor` shorthands can be used to declare a color variable easily:
 
 ```code
-PixelColor red = {.value = 0xff0000};                               // 0x(ww)rrggbb order
-PixelColor green = {.color = {.b = 0, .g = 0xff, .r = 0, .w = 0}};  // named fields, must be in this order
+PixelColor red = MakePixelColor(0xff0000);      // 0x(ww)rrggbb order
+PixelColor green = MakePixelColor(0, 0xff, 0);  // R, G, B (,W) order
 ```
 
-The above declarations may be a bit lengthy, however, changing the color of a pixel can easily be done like this:
+For changing an existing color, the color or value fields can be used:
 
 ```code
 PixelColor myPixel = neopixelBlack;
@@ -75,7 +75,7 @@ myPixel.color.r = 0xff;     // just change the red channel
 myPixel.value = 0xff0000;   // set all channels at once
 ```
 
-## Skeleton
+## Code snippet
 
 Below the code that is needed to set the first Neopixel to medium bright red, on a total set of 24 Neopixels
 
@@ -107,16 +107,14 @@ More examples in `pioarduino`, you can adapt them yourself to run in the ESP-IDF
 - Rainbow - all colors distributed over the Neopixels, slowly shifting/turning by recalculation and by in-memory rotation
 - Range - filling and rotating a part of the Neopixels only
 
-## Documentation
+## Documentation (docs) folder
 
-The folder `documentation` contains detailed information on I2S, the SEQ/SEQ4 timing, choosing the right PixelType and about the wiring.
+The folder `docs` contains detailed information on I2S, the SEQ/SEQ4 timing, choosing the right PixelType and about the wiring.
 
 ## Development (dev) folder
 
 This repository is an ESP-IDF **_component_** (aka: library).
 
-For development purposes, the `dev` folder contains the ESP-IDF environment to build a Test Program. The repository root `CMakeLists.txt` supports direct ESP-IDF commands from this workspace while still acting as a reusable component when included elsewhere. This way, the component can easily be tested without having a separate (example) program.
+Additionally, the `dev` folder contains the ESP-IDF environment to build and run a Test Program for development purposes. This way, the component can easily be tested without the need of having a separate (example) program.
 
 See the README.md in the `dev` folder on how to use it.
-
-Initially, VSC may show #include errors and missing settings in the .vscode files. These will be solved automatically while building the Test Program.
