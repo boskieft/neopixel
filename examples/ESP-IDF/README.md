@@ -31,6 +31,18 @@ ESP-IDF-blink
 |-- CMakeLists.txt
 ```
 
+### NOTE on `idf_component.yml`
+
+Thia file specifies where to find the Neopixel Driver in the `ESP Registry`:
+
+```code
+dependencies:
+  boskieft/neopixel:
+    version: "^2.0.0"   # allow compatible 2.x.y releases
+```
+
+In case the driver gets a major update (to 3.x.y) this file (and maybe the Example code as well) needs to be updated.
+
 ### NOTE on red squiggles and warnings
 
 Looking into the *.cpp file(s) you may see red squiggles under the #includes, complaining that these files cannot be opened.

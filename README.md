@@ -1,5 +1,7 @@
 # Neopixel driver for ESP32xx using I2S
 
+[![Component Registry](https://components.espressif.com/components/boskieft/neopixel/badge.svg)](https://components.espressif.com/components/boskieft/neopixel)
+
 Reliable ESP32xx driver for Neopixels, using I2S with DMA.
 
 This driver supports addressable RGB/RGBW LEDs using WS2812x / SK6812x compatible signaling, including Adafruit NeoPixel products and compatible LEDs from other manufacturers.

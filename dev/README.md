@@ -14,8 +14,6 @@ Copy or clone the whole Neopixel Driver repository from GitHub into your local `
 
 See instructions in README.md of that folder.
 
-NOTE: To publish a release to the ESP Registry, this link must be removed (to prevent an infinite loop while collecting the files).
-
 ## Configure, Build, Run
 
 Open the `neopixel` folder in VSC.
@@ -56,3 +54,66 @@ I (3338) STAT: minimumFreeStack=828
 ```
 
 NOTE: In app_main() the log level of individual parts can be set to Debug to see more logging.
+
+## Release procedure
+
+* Update `neopixel\idf_component.yml` with the new version (eg `version: "2.1.0"`)
+* In VSC Source Control, Push the changes to GitHub
+* In VSC Source Control, create a Tag (eg v2.0.1) and Push the tag to GitHub
+* In GitHub, create a Release (eg v2.1.0) based on that tag
+* In VSC Terminal (PowerShell), use `compote` command to upload the driver to the ESP Registry (see instructions below)
+
+## Upload to ESP Registry - Manual (NOT using Github Actions)
+
+### One time only: Login to registry
+
+In Windows, open `Terminal` with PowerShell (PS prompt), and give command:
+
+```code
+compote registry login --default-namespace boskieft
+```
+
+The web brower will open a page and ley you create \<YOURTOKEN\> of almost 100 characters.
+
+Copy/paste this token at the "Token:" prompt in `Terminal`:
+
+```text
+If browser did not open automatically please visit this URL:
+        https://components.espressif.com/settings/...etc...
+Please create a token in the browser window and paste here
+Token: <YOURTOKEN>
+Successfully logged in
+```
+
+### Remove the link
+
+Remove the link in the `dev\components` folder (see above) temporarily, to prevent an endless loop while collecting files.
+
+### Upload
+
+In Windows, open `Terminal` with PowerShell (PS prompt), and give command:
+
+```code
+compote component upload --name neopixel 
+```
+
+Example:
+
+```text
+PS <YOURPATH>\neopixel> compote component upload --name neopixel  
+NOTE: Saving component archive to "<YOURPATH>\neopixel\dist\neopixel_2.0.0.tgz"
+NOTE: Uploading archive <YOURPATH>\neopixel\dist\neopixel_2.0.0.tgz
+Uploading ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100.0% 45.38kB/45.38kB [0s] 
+NOTE: Wait for processing, it is safe to press CTRL+C and exit
+You can check the state of processing by running CLI command "compote component upload-status --job=<JOBNUMBER> "
+Processing examples ━━━━━━━━━━━━━━━━━━━━━━━━━━━╺━━  90.0% 90.0/100 [7s]
+NOTE: The uploaded component was successfully processed. It may take up to 5 minutes for the new version to be available globally.
+View at: https://components.espressif.com/components/boskieft/neopixel/versions/2.0.0
+Processing examples ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100.0% 100/100 [10s] 
+```
+
+### Recreate the link
+
+Enable the development environment again, by recreating the link in folder `dev\components`.
+
+See instructions in README.md of that folder.
