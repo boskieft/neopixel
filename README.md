@@ -1,8 +1,10 @@
 # Neopixel driver for ESP32xx using I2S
 
-[![Component Registry](https://components.espressif.com/components/boskieft/neopixel/badge.svg)](https://components.espressif.com/components/boskieft/neopixel)
+ESP-IDF [![Component Registry](https://components.espressif.com/components/boskieft/neopixel/badge.svg)](https://components.espressif.com/components/boskieft/neopixel)
+<!--[![PlatformIO Registry](https://badges.registry.platformio.org/packages/boskieft/library/neopixel.svg)](https://registry.platformio.org/libraries/boskieft/neopixel)-->
+[![GitHub latest commit](https://badgen.net/github/last-commit/boskieft/neopixel)](https://GitHub.com/boskieft/neopixel/commit/)
 
-Reliable ESP32xx driver for Neopixels, using I2S with DMA.
+Rock solid, low profile ESP32xx driver for Neopixels, using I2S with DMA.
 
 This driver supports addressable RGB/RGBW LEDs using WS2812x / SK6812x compatible signaling, including Adafruit NeoPixel products and compatible LEDs from other manufacturers.
 
@@ -20,9 +22,8 @@ Features:
 - **1...N:** Drives 1 up to more than 20000 Neopixels (limited by RAM memory and transmission time < 1 sec)
 - **Fast:** Driver waits for transmission completion in separate task.
 - **Easy:** No polling, no throttling, the driver takes care.
-- **Rotate:** In-memory left or right rotation for (a range of) Neopixels.
-- **Fill:** In-memory color filling for (a range of) Neopixels.
-- **Logging:** Using standard ESP_LOGx(), activate Debug for more.
+- **In-memory functions:** for filling and rotating, for low CPU impact
+- **Logging:** Using standard ESP_LOGx().
 - **Statistics:** On timing and errors.
 
 ## Tested ESP32xx devices
@@ -97,17 +98,17 @@ Each environment contains a README.md file, explaning how to build in general.
 
 ### ESP-IDF
 
-- Blink - blink one Neopixel (and one classic LED)
+- Blink - blink one Neopixel
 - Chaser - run Neopixels one afer another
 
 More examples in `pioarduino`, you can adapt them yourself to run in the ESP-IDF environment.
 
 ### pioarduino
 
-- Blink - blink one Neopixel (and one classic LED)
+- Blink - blink one Neopixel
 - Chaser - run Neopixels one afer another
-- Rainbow - all colors distributed over the Neopixels, slowly shifting/turning by recalculation and by in-memory rotation
-- Range - filling and rotating a part of the Neopixels only
+- Rainbow - all colors distributed over the Neopixels, slowly turning by in-memory rotation
+- Range - filling and rotating a part of the Neopixels only, using in-memory functions
 
 ## Documentation (docs) folder
 
@@ -117,6 +118,6 @@ The folder `docs` contains detailed information on I2S, the SEQ/SEQ4 timing, cho
 
 This repository is an ESP-IDF **_component_** (aka: library).
 
-Additionally, the `dev` folder contains the ESP-IDF environment to build and run a Test Program for development purposes. This way, the component can easily be tested without the need of having a separate (example) program.
+Additionally, the `dev` folder contains the ESP-IDF environment to build and run an extensive Test Program for development purposes. This way, the component can easily be tested without the need of having a separate (example) program.
 
 See the README.md in the `dev` folder on how to use it.
