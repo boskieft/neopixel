@@ -36,9 +36,22 @@ jobs:
           echo "Tag: $tag"
           echo "RELEASE_TAG=$tag" >> $GITHUB_ENV
 
+      - name: Resolve checkout ref
+        env:
+          input_git_ref: ${{ inputs.git_ref }}
+        run: |
+          git_ref=$(echo "$input_git_ref" | tr -cd '[:alnum:]/_.-')
+
+          if [[ -z "$git_ref" || $git_ref == tag ]]; then
+            git_ref=$RELEASE_TAG
+          fi
+
+          echo "Checkout ref: $git_ref"
+          echo "CHECKOUT_REF=$git_ref" >> $GITHUB_ENV
+
       - uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.git_ref || env.RELEASE_TAG }}
+          ref: ${{ env.CHECKOUT_REF }}
           submodules: "recursive"
 
       - name: Upload components to the component registry
