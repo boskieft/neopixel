@@ -10,6 +10,7 @@
 #include <esp_log.h>
 
 #include "neopixel.h"
+#include "neopixel_version.h"
 #include "neopixel_seq3.h"
 #include "neopixel_seq4.h"
 
@@ -34,7 +35,7 @@ bool NeopixelDriver<Mode>::begin(
 
     uint32_t bitRate;
 
-    ESP_LOGI(TAG, "Beginning the Neopixel Driver on dataPin=%d with %d Neopixels", dataPin, arg_nrPixels);
+    ESP_LOGI(TAG, "Beginning the Neopixel Driver version=`%s` on dataPin=%d with %d Neopixels", NEOPIXEL_VERSION, dataPin, arg_nrPixels);
 
     if (buffer != nullptr) {
         ESP_LOGE(TAG, "Already initialised");
