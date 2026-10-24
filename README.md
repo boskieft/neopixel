@@ -1,18 +1,17 @@
 # Neopixel driver for ESP32xx using I2S
 
-ESP-IDF [![Component Registry](https://components.espressif.com/components/boskieft/neopixel/badge.svg)](https://components.espressif.com/components/boskieft/neopixel)
-<!--[![PlatformIO Registry](https://badges.registry.platformio.org/packages/boskieft/library/neopixel.svg)](https://registry.platformio.org/libraries/boskieft/neopixel)-->
+[![Component Registry](https://components.espressif.com/components/boskieft/neopixel/badge.svg)](https://components.espressif.com/components/boskieft/neopixel)
 [![GitHub latest commit](https://badgen.net/github/last-commit/boskieft/neopixel)](https://GitHub.com/boskieft/neopixel/commit/)
 
 Rock solid, low profile ESP32xx driver for Neopixels, using I2S with DMA.
 
-This driver supports addressable RGB/RGBW LEDs using WS2812x / SK6812x compatible signaling, including Adafruit NeoPixel products and compatible LEDs from other manufacturers.
+This driver supports WS2812x/SK6812x compatible addressable RGB/RGBW LEDs, including the Adafruit `NeoPixel` products and compatible LEDs from other manufacturers.
 
 Features:
 
 - **ESP32xx family:** Tested on 5 ESP32xx variants (see paragraph below).
 - **ESP-IDF:** Works on ESP-IDF v5.5.5 and above (incl 6.x)
-- **Pioarduino:** Compatible with the Platformio + Arduino by the Pioarduino framework.
+- **Pioarduino:** To be compatible with the Platformio + Arduino framework.
 - **I2S:** Using the standard I2S driver of ESP-IDF:
   - DMA for minimal processor load and rock solid transmits
   - Keeps SPI with DMA available for other purposes.
