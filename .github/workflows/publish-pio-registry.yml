@@ -36,7 +36,8 @@ jobs:
             TAG_NAME="${{ inputs.tag_name }}"
           fi
           echo "Downloading tag: $TAG_NAME"
-          curl -L -o project.zip "https://github.com/${{ github.repository }}/archive/refs/tags/$TAG_NAME.zip"
+          curl -fSL --retry 3 --retry-delay 2 -o project.zip "https://github.com/${{ github.repository }}/archive/refs/tags/$TAG_NAME.zip"
+          unzip -t project.zip
 
       - name: Cache PlatformIO
         uses: actions/cache@v6
