@@ -11,11 +11,11 @@
 */
 
 // Major version number (X.x.x)
-#define NEOPIXEL_VERSION_MAJOR 0
+#define NEOPIXEL_VERSION_MAJOR 2
 // Minor version number (x.X.x)
-#define NEOPIXEL_VERSION_MINOR 0
+#define NEOPIXEL_VERSION_MINOR 2
 // Patch version number (x.x.X)
-#define NEOPIXEL_VERSION_PATCH 0
+#define NEOPIXEL_VERSION_PATCH 1
 
 // Macro to convert version number into an integer
 // To be used in comparisons, such as NEOPIXEL_VERSION >= NEOPIXEL_VERSION_VAL(2, 0, 0)
