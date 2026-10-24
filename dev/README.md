@@ -58,10 +58,14 @@ NOTE: In app_main() the log level of individual parts can be set to Debug to see
 ## GitHub Actions release procedue (recommended)
 
 * In VSC Source Control, Commit and Push the changes to GitHub
-* In GitHub tab Actions, run the next workflows:
-  * `Release Version` -> this will update the version several repo files, and tag the release
+* In GitHub tab `Actions`, run the next `Workflows`:
+  * `Release Version` -> this will update the version in the next repo files, and tag the release:
+    * include\neopixel_version.h (for driver itself)
+    * idf_component.yml (manifest for ESP-IDF)
+    * library.json (manifest for Platmormio)
   * `Publish ESP-IDF component`-> upload to the ESP Registry [https://components.espressif.com/components/boskieft/neopixel]
   * `Publish to Platformio` -> upload to the Platformio Registry: [https://registry.platformio.org/libraries/boskieft/neopixel]
+* In VSC Source Control, Pull the changes from GitHub (to have the repo files with updated version info)
 
 -/-/-/-/-/-/-/-
 
