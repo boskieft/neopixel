@@ -33,39 +33,49 @@ With an ESP32-C3 chip, the VSC [Terminal] will show logging like this:
 ...
 rst:0x15 (USB_UART_CHIP_RESET),boot:0xf (SPI_FAST_FLASH_BOOT)
 ...
-I (278) main_task: Started on CPU0
-I (278) main_task: Calling app_main()
-I (3278) MAIN: ----- Starting Test Program, chip=`esp32c3` -----
-I (3278) MAIN: Status LED configured on pin=8
-I (3278) MAIN: Switching On enablePin=10
-I (3278) NPIX: Beginning the Neopixel Driver on dataPin=5 with 24 Neopixels
-D (3288) NPIX: GRB Neopixels, seq3 timing
-D (3288) I2S_: Big-Endian buffer
-D (3298) I2S_: Raw data size=216 bytes, bitRate=2400000 bps
-D (3298) I2S_: Optimised buffer size=216 bytes, frames/chunk=54, bytes/frame=4, DMA chunks=2
-D (3308) I2S_: Sample rate=75000 frames/sec
-D (3308) I2S_: Interrupt priority=0
-I (3318) I2S_: Started I2S channel=0, internal DMA buffer size=432 bytes, required transmit time=1440 us
-D (3328) I2S_: Starting separate Task for Transmit Control on core=0, priority=2
-D (3338) I2S_: maxSendMicros=182
-I (3338) STAT: maxNrChunksSent=2
-I (3338) STAT: minimumFreeStack=828
+I (24) boot: ESP-IDF v6.1 2nd stage bootloader
+I (24) boot: compile time Oct 24 2026 22:51:52
+...
+I (160) app_init: Application information:
+I (165) app_init: Project name:     neopixel_dev
+I (170) app_init: App version:      v2.3.0-2-g3f5148c-dirty
+I (177) app_init: Compile time:     Oct 24 2026 22:54:18
+...
+I (277) main_task: Started on CPU0
+I (277) main_task: Calling app_main()
+I (3277) MAIN: ----- Starting Test Program, chip=`esp32c3` -----
+I (3277) MAIN: Status LED configured on pin=8
+I (3277) MAIN: Switching On enablePin=10
+I (3277) NPIX: Beginning the Neopixel Driver version=`2.3.0` on dataPin=5 with 24 Neopixels
+D (3287) NPIX: GRB Neopixels, seq3 timing
+D (3287) I2S_: Big-Endian buffer
+D (3297) I2S_: Raw data size=216 bytes, bitRate=2400000 bps
+D (3297) I2S_: Optimised buffer size=216 bytes, frames/chunk=54, bytes/frame=4, DMA chunks=2
+D (3307) I2S_: Sample rate=75000 frames/sec
+D (3317) I2S_: Interrupt priority=0
+I (3317) I2S_: Started I2S channel=0, internal DMA buffer size=432 bytes, required transmit time=1440 us
+D (3327) I2S_: Starting separate Task for Transmit Control on core=0, priority=2
+D (3337) I2S_: maxSendMicros=172
+I (3337) STAT: maxNrChunksSent=2
+I (3337) STAT: minimumFreeStack=828
 ...
 ```
 
-NOTE: In app_main() the log level of individual parts can be set to Debug to see more logging.
+NOTE: In app_main() the log levels have been set to Debug to see more logging.
 
 ## GitHub Actions release procedue (recommended)
 
-* In VSC Source Control, Commit and Push the changes to GitHub
-* In GitHub tab `Actions`, run the next `Workflows`:
+In GitHub Actions, several Workflows have been defined for releasing and publishing. They can be accessed on the Actions tab of GitHub website, or via VSC -> GitHub Actions (left side bar).
+
+* In VSC `Source Control`, Commit and Push the changes to GitHub
+* In GitHub `Actions`, run the next `Workflows`:
   * `Release Version` -> this will update the version in the next repo files, and tag the release:
     * include\neopixel_version.h (for driver itself)
     * idf_component.yml (manifest for ESP-IDF)
     * library.json (manifest for Platmormio)
   * `Publish ESP-IDF component`-> upload to the ESP Registry [https://components.espressif.com/components/boskieft/neopixel]
   * `Publish to Platformio` -> upload to the Platformio Registry: [https://registry.platformio.org/libraries/boskieft/neopixel]
-* In VSC Source Control, Pull the changes from GitHub (to have the repo files with updated version info)
+* In VSC `Source Control`, Pull the changes from GitHub (to have the repo files with updated version info)
 
 -/-/-/-/-/-/-/-
 
