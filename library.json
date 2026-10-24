@@ -1,6 +1,6 @@
 {
   "name": "neopixel",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Neopixel driver for ESP32xx using I2S",
   "keywords": "neopixel, esp32xx, i2s, dma, ws2812b, sk6812b, rgb, rgbw",
   "repository":
