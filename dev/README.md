@@ -55,17 +55,26 @@ I (3338) STAT: minimumFreeStack=828
 
 NOTE: In app_main() the log level of individual parts can be set to Debug to see more logging.
 
-## Release procedure
+## GitHub Actions release procedue (recommended)
+
+* In VSC Source Control, Commit and Push the changes to GitHub
+* In GitHub tab Actions, run the next workflows:
+  * `Release Version` -> this will update the version several repo files, and tag the release
+  * `Publish ESP-IDF component`-> upload to the ESP Registry [https://components.espressif.com/components/boskieft/neopixel]
+  * `Publish to Platformio` -> upload to the Platformio Registry: [https://registry.platformio.org/libraries/boskieft/neopixel]
+
+-/-/-/-/-/-/-/-
+
+## Manual Release procedure (OBSOLETE)
+
+### Manual ESP: Create release on GitHub
 
 * Update `neopixel\idf_component.yml` with the new version (eg `version: "2.1.0"`)
 * In VSC Source Control, Push the changes to GitHub
 * In VSC Source Control, create a Tag (eg v2.0.1) and Push the tag to GitHub
 * In GitHub, create a Release (eg v2.1.0) based on that tag
-* In VSC Terminal (PowerShell), use `compote` command to upload the driver to the ESP Registry (see instructions below)
 
-## Upload to ESP Registry - Manual (NOT using Github Actions)
-
-### One time only: Login to registry
+### Manual ESP: One time only: Login to registry
 
 In Windows, open `Terminal` with PowerShell (PS prompt), and give command:
 
@@ -85,11 +94,11 @@ Token: <YOURTOKEN>
 Successfully logged in
 ```
 
-### Remove the link
+### Manual ESP: Remove the link
 
 Remove the link in the `dev\components` folder (see above) temporarily, to prevent an endless loop while collecting files.
 
-### Upload
+#### Manual ESP: Upload
 
 In Windows, open `Terminal` with PowerShell (PS prompt), and give command:
 
@@ -112,8 +121,12 @@ View at: https://components.espressif.com/components/boskieft/neopixel/versions/
 Processing examples ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100.0% 100/100 [10s] 
 ```
 
-### Recreate the link
+### Manual ESP: Recreate the link
 
 Enable the development environment again, by recreating the link in folder `dev\components`.
 
 See instructions in README.md of that folder.
+
+### Manual Platformio
+
+Never did this, used GitHub Actions from start
