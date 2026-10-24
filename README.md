@@ -11,18 +11,19 @@ This driver supports addressable RGB/RGBW LEDs using WS2812x / SK6812x compatibl
 Features:
 
 - **ESP32xx family:** Tested on 5 ESP32xx variants (see paragraph below).
-- **ESP-IDF:** Works on ESP-IDF v5.5.5 and above, with and without the (Pio)Arduino framework.
+- **ESP-IDF:** Works on ESP-IDF v5.5.5 and above (incl 6.x)
+- **Pioarduino:** Compatible with the Platformio + Arduino by the Pioarduino framework.
 - **I2S:** Using the standard I2S driver of ESP-IDF:
-  - DMA for minimal processor load and interrupts.
+  - DMA for minimal processor load and rock solid transmits
   - Keeps SPI with DMA available for other purposes.
-- **GRB/GRBW:** Configurable for GRB (3 colors) or GRBW (3 colors + white) Neopixels.
-- **SEQ3/SEQ4:** Configurable for best match on your Neopixel's timing:
+- **RGB/RGBW:** Configurable for RGB (3 colors) or RGBW (3 colors + white) Neopixels, in the usual GRB(W) order.
+- **SEQ3/SEQ4:** Select for best match on your Neopixel's timing:
   - 3 bit sequence, period=1200ns, dutycycle: Off=33%, On=67%
   - 4 bit sequence, period=1200ns, dutycycle: Off=25%, On=50%
-- **1...N:** Drives 1 up to more than 20000 Neopixels (limited by RAM memory and transmission time < 1 sec)
-- **Fast:** Driver waits for transmission completion in separate task.
+- **1...N:** Drives 1 up to more than 20000 Neopixels (limited by RAM memory and transmission time < 1 sec).
+- **Fast:** Driver waits for transmit completion in separate task, allowing you to prepare the next already.
 - **Easy:** No polling, no throttling, the driver takes care.
-- **In-memory functions:** for filling and rotating, for low CPU impact
+- **In-memory functions:** Filling and rotating with low CPU impact.
 - **Logging:** Using standard ESP_LOGx().
 - **Statistics:** On timing and errors.
 
@@ -94,7 +95,7 @@ npx.show();                               // show it on the Neopixels
 
 The `examples` folder contains demos for the `ESP-IDF` and `pioarduino` environment.
 
-Each environment contains a README.md file, explaning how to build in general.
+Each environment contains a README.md file, explaining how to build.
 
 ### ESP-IDF
 
