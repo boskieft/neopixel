@@ -1,8 +1,9 @@
 {
   "name": "neopixel",
   "version": "2.2.2",
-  "description": "Neopixel driver for ESP32xx using I2S",
-  "keywords": "neopixel, esp32xx, i2s, dma, ws2812b, sk6812b, rgb, rgbw",
+  "description": "Neopixel driver for ESP32xx using I2S and DMA",
+  "keywords": "neopixel,esp32xx,i2s,dma,ws2812b,sk6812b,rgb,rgbw",
+  "homepage": "https://github.com/boskieft/neopixel",
   "repository":
   {
     "type": "git",
@@ -16,6 +17,6 @@
     }
   ],
   "license": "MIT",
-  "frameworks": "*",
-  "platforms": "platformio/espressif32"
+  "frameworks": "arduino",
+  "platforms": "espressif32"
 }
