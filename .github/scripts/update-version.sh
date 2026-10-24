@@ -25,10 +25,10 @@ NEOPIXEL_VERSION="$NEOPIXEL_VERSION_MAJOR.$NEOPIXEL_VERSION_MINOR.$NEOPIXEL_VERS
 
 echo "New Neopixel Driver version: $NEOPIXEL_VERSION"
 
-echo "Updating library.properties..."
-cat library.properties | sed "s/version=.*/version=$NEOPIXEL_VERSION/g" > __library.properties && mv __library.properties library.properties
+echo "Updating idf_component.yml for ESP-IDF..."
+cat idf_component.yml | sed "s/version:.*/version: $NEOPIXEL_VERSION/g" > __idf_component.yml && mv __idf_component.yml idf_component.yml
 
-echo "Updating library.json..."
+echo "Updating library.json for Pioarduino..."
 cat library.json | sed "s/^  \"version\":.*/  \"version\": \"$NEOPIXEL_VERSION\",/g" > __library.json && mv __library.json library.json
 
 echo "Updating include/neopixel_version.h..."
