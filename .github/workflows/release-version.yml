@@ -1,4 +1,6 @@
-name: Release Version
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Release version to GitHub
 
 on:
     workflow_dispatch:
@@ -28,7 +30,7 @@ jobs:
 
                   input="${{ inputs.version }}"
                   if [[ ! "$input" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-                    echo "Invalid version: $input"
+                    echo "ERROR: Invalid version='$input'"
                     echo "Expected format: v2.2.1 or 2.2.1"
                     exit 1
                   fi
@@ -50,11 +52,11 @@ jobs:
                   set -euo pipefail
                   tag="${{ steps.ver.outputs.tag }}"
                   if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
-                    echo "Tag $tag already exists locally."
+                    echo "ERROR: Tag='$tag' already exists locally."
                     exit 1
                   fi
                   if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
-                    echo "Tag $tag already exists on origin."
+                    echo "ERROR: Tag='$tag' already exists on origin."
                     exit 1
                   fi
 
@@ -67,46 +69,34 @@ jobs:
                     "${{ steps.ver.outputs.minor }}" \
                     "${{ steps.ver.outputs.patch }}"
 
-            - name: Detect changes
-              id: changes
+            - name: Detect and commit changes
               shell: bash
               run: |
                   set -euo pipefail
 
+                  # List of version files to check for changes, must match script "update-version.sh"
                   files=(
                     "idf_component.yml"
                     "library.json"
                     "include/neopixel_version.h"
                   )
 
-                  changed=false
-                  for f in "${files[@]}"; do
-                    if ! git diff --quiet -- "$f"; then
-                      changed=true
-                      break
-                    fi
-                  done
-
-                  echo "changed=$changed" >> "$GITHUB_OUTPUT"
-
-                  if [[ "$changed" == "false" ]]; then
-                    echo "No version file changes detected. Nothing to release."
+                  if git diff --quiet -- "${files[@]}"; then
+                    echo "INFO: No version file changes detected; skipping commit."
+                    # proceed with next step(s) in workflow
+                    exit 0
                   fi
 
-            - name: Commit changes
-              if: steps.changes.outputs.changed == 'true'
-              shell: bash
-              run: |
-                  set -euo pipefail
+                  # Commit the file changes
+                  echo "INFO: Committing version='${{ steps.ver.outputs.tag }}' changes to version files."
                   git config user.name "github-actions[bot]"
                   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-                  git add idf_component.yml library.json include/neopixel_version.h
-                  git commit -m "chore: release ${{ steps.ver.outputs.tag }}"
+                  git add "${files[@]}"
+                  git commit -m "chore: Set release='${{ steps.ver.outputs.tag }}' in version files"
                   git push origin HEAD
 
             - name: Create and push tag
-              if: steps.changes.outputs.changed == 'true'
               shell: bash
               run: |
                   set -euo pipefail
@@ -115,7 +105,6 @@ jobs:
                   git push origin "$tag"
 
             - name: Create GitHub Release page
-              if: steps.changes.outputs.changed == 'true'
               uses: softprops/action-gh-release@v3
               with:
                   tag_name: ${{ steps.ver.outputs.tag }}
@@ -123,9 +112,3 @@ jobs:
                   generate_release_notes: true
                   draft: false
                   prerelease: false
-
-            - name: No-op summary
-              if: steps.changes.outputs.changed != 'true'
-              shell: bash
-              run: |
-                  echo "WARNING: Skipped commit/tag/release because version files did not change."

@@ -1,8 +1,8 @@
 # Development
 
-This "neopixel" repository is an ESP-IDF component (aka: library), NOT a standalone ESP-IDF application.
+This "neopixel" repository is an ESP-IDF Component (aka: library), NOT a standalone ESP-IDF application.
 
-However, the `dev` directory (here) also contains the ESP-IDF Test Program, that can be used to compile and run the component on target.
+However, the `dev` directory (here) also contains the extensive ESP-IDF Test Program, that can be used to compile and run the component on target.
 
 ## Copy/Clone
 
@@ -65,17 +65,17 @@ NOTE: In app_main() the log levels have been set to Debug to see more logging.
 
 ## GitHub Actions release procedue (recommended)
 
-In GitHub Actions, several Workflows have been defined for releasing and publishing. They can be accessed on the Actions tab of GitHub website, or via VSC -> GitHub Actions (left side bar).
+In GitHub Actions, several Workflows have been defined for releasing and publishing a new version. They can be accessed on the Actions tab of GitHub website, or via VSC -> GitHub Actions (left side bar).
 
 * In VSC `Source Control`, Commit and Push the changes to GitHub
 * In GitHub `Actions`, run the next `Workflows`:
-  * `Release Version` -> this will update the version in the next repo files, and tag the release:
+  * `Release version to GitHub` -> this will update the version in the next repo files, and tag the release:
     * include\neopixel_version.h (for driver itself)
     * idf_component.yml (manifest for ESP-IDF)
     * library.json (manifest for Platmormio)
-  * `Publish ESP-IDF component`-> upload to the ESP Registry [https://components.espressif.com/components/boskieft/neopixel]
-  * `Publish to Platformio` -> upload to the Platformio Registry: [https://registry.platformio.org/libraries/boskieft/neopixel]
-* In VSC `Source Control`, Pull the changes from GitHub (to have the repo files with updated version info)
+  * `Publish to ESP Registry`-> upload and publish to the [ESP Registry](https://components.espressif.com/components/boskieft/neopixel)
+  * `Publish to PlatformIO Registry` -> upload and publish to the [Platformio Registry](https://registry.platformio.org/libraries/boskieft/neopixel)
+* In VSC `Source Control`, Pull the changes back from GitHub (to have the local repo files with updated version info)
 
 -/-/-/-/-/-/-/-
 

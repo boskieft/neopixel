@@ -36,6 +36,13 @@ Tested successfully on the ESP32xx devices listed below.
 - ESP32-C3 (Mini Pro)
 - ESP32-C6 (Seeed)
 
+## Published releases
+
+The GitHub releases are publised in the registries of ESP and Platformio:
+
+- [ESP Registry](https://components.espressif.com/components/boskieft/neopixel)
+- [PlatformIO Registry](https://registry.platformio.org/libraries/boskieft/neopixel)
+
 ## Build environment
 
 The driver is written in C++ using the ESP-IDF environment, tested with version 5.5.5 (minimum) and 6.1 (current). It has no dependencies towards pioarduino or Arduino, but can simply be used by them.

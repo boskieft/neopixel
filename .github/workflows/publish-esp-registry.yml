@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: Publish to ESP Registry
+
+on:
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: "Tag or version to publish (use 'latest' for the most recent tag)"
+                required: true
+                default: "latest"
+
+permissions:
+    contents: read
+
+jobs:
+    upload_components:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+              with:
+                  fetch-tags: true
+                  fetch-depth: 0
+
+            - name: Show latest tag
+              run: git tag --sort=-creatordate | head -n 1
+
+            - name: Resolve tag
+              id: tag
+              shell: bash
+              run: |
+                  set -euo pipefail
+
+                  tag="${{ inputs.tag }}"
+                  if [ "$tag" = "latest" ]; then
+                    tag="$(git tag --sort=-creatordate | head -n 1)"
+                    if [ -z "$tag" ]; then
+                      echo "ERROR: No tags found in the repository."
+                      exit 1
+                    fi
+                  fi
+
+                  echo "INFO: Publishing tag='$tag'"
+                  echo "resolved_tag=$tag" >> "$GITHUB_OUTPUT"
+
+            - name: Checkout selected tag
+              uses: actions/checkout@v7
+              with:
+                  ref: ${{ steps.tag.outputs.resolved_tag }}
+                  submodules: recursive
+
+            - name: Upload components to the component registry
+              uses: espressif/upload-components-ci-action@v2
+              with:
+                  components: "neopixel:."
+                  version: ${{ steps.tag.outputs.resolved_tag }}
+                  namespace: boskieft
+                  api_token: ${{ secrets.IDF_COMPONENT_API_TOKEN }}
