@@ -27,10 +27,10 @@ void logStatistics(void) {
     //---------------------------------------------------------------------------------------------
     if (esp_log_level_get("I2S_") < ESP_LOG_DEBUG) {
         // Driver is not logging it, do it here
-        static int loggedMaxSendMicros = 0;
+        static int64_t loggedMaxSendMicros = 0;
         if (npx.stats.maxSendMicros > loggedMaxSendMicros) {
             loggedMaxSendMicros = npx.stats.maxSendMicros;
-            ESP_LOGI(TAG, "maxSendMicros=%d", loggedMaxSendMicros);
+            ESP_LOGI(TAG, "maxSendMicros=%" PRId64, loggedMaxSendMicros);
         }
     } // else: don't log twice
 
@@ -41,10 +41,10 @@ void logStatistics(void) {
     // Will increase on certain ESP32xx variants when sending fast to a small number of Neopixels,
     // because the Driver may need to send multiple dummy flush chunks until it is done
     //---------------------------------------------------------------------------------------------
-    static int loggedMaxChunksSent = 0;
+    static uint32_t loggedMaxChunksSent = 0;
     if (npx.stats.maxNrChunksSent > loggedMaxChunksSent) {
         loggedMaxChunksSent = npx.stats.maxNrChunksSent;
-        ESP_LOGI(TAG, "maxNrChunksSent=%d", loggedMaxChunksSent);
+        ESP_LOGI(TAG, "maxNrChunksSent=%" PRIu32, loggedMaxChunksSent);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -52,20 +52,20 @@ void logStatistics(void) {
     //
     // Never seen this happen in practice
     //---------------------------------------------------------------------------------------------
-    static int loggedNrPreloadDataErrors = 0;
+    static uint32_t loggedNrPreloadDataErrors = 0;
     if (npx.stats.nrPreloadDataErrors > loggedNrPreloadDataErrors) {
         loggedNrPreloadDataErrors = npx.stats.nrPreloadDataErrors;
-        ESP_LOGI(TAG, "nrPreloadDataErrors=%d", loggedNrPreloadDataErrors);
+        ESP_LOGI(TAG, "nrPreloadDataErrors=%" PRIu32, loggedNrPreloadDataErrors);
     }
     //---------------------------------------------------------------------------------------------
     // Channel errors
     //
     // Never seen this happen in practice
     //---------------------------------------------------------------------------------------------
-    static int loggedNrChannelErrors = 0;
+    static uint32_t loggedNrChannelErrors = 0;
     if (npx.stats.nrChannelErrors > loggedNrChannelErrors) {
         loggedNrChannelErrors = npx.stats.nrChannelErrors;
-        ESP_LOGI(TAG, "nrChannelErrors=%d", loggedNrChannelErrors);
+        ESP_LOGI(TAG, "nrChannelErrors=%" PRIu32, loggedNrChannelErrors);
     }
 
     //---------------------------------------------------------------------------------------------
@@ -73,10 +73,10 @@ void logStatistics(void) {
     //
     // Only seen this one happen in case the dataPin was not configured correctly
     //---------------------------------------------------------------------------------------------
-    static int loggedNrTimeouts = 0;
+    static uint32_t loggedNrTimeouts = 0;
     if (npx.stats.nrTimeouts > loggedNrTimeouts) {
         loggedNrTimeouts = npx.stats.nrTimeouts;
-        ESP_LOGI(TAG, "nrTimeouts=%d", loggedNrTimeouts);
+        ESP_LOGI(TAG, "nrTimeouts=%" PRIu32, loggedNrTimeouts);
     }
 
 #if (ENABLE_I2S_TASK_VERSION)
