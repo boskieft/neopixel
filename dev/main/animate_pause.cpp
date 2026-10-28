@@ -32,7 +32,7 @@ bool animatePause(unsigned long currentMillis) {
         //---------------------------------
         //  Show static image (all blue)
         //---------------------------------
-        ESP_LOGD(TAG, "Pause: show all blue pixels");
+        ESP_LOGI(TAG, "Start Pause animation: show all blue pixels");
         npx.setAllPixels(dimmedBlue);
         npx.show();
         timeoutMillis = currentMillis + 3000; // delay for visibility all blue
@@ -58,6 +58,5 @@ bool animatePause(unsigned long currentMillis) {
         return (true); // done with error
         break;
     }
-    return (false); // not done yet
     return (false); // not done yet
 }

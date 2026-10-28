@@ -26,6 +26,9 @@ static const char *TAG = "MAIN";
 //-----------------------------------------------
 void logStatistics(void);
 bool animateRanges(unsigned long currentMillis);
+bool animateFadeOut(unsigned long currentMillis);
+bool animateBrightness(unsigned long currentMillis);
+bool animateWobble(unsigned long currentMillis);
 bool animatePause(unsigned long currentMillis);
 
 /*
@@ -110,7 +113,10 @@ extern "C" void app_main(void) {
     esp_log_level_set("NPIX", ESP_LOG_DEBUG);
     esp_log_level_set("I2S_", ESP_LOG_DEBUG);
     // esp_log_level_set("RANGES", ESP_LOG_DEBUG);
+    // esp_log_level_set("WOBBLE", ESP_LOG_DEBUG);
     // esp_log_level_set("PAUSE", ESP_LOG_DEBUG);
+    esp_log_level_set("BRIGHT", ESP_LOG_DEBUG);
+
     vTaskDelay(3000 / portTICK_PERIOD_MS); // allow Terminal to connect
 
     ESP_LOGI(TAG, "----- Starting Test Program, chip=`%s` -----", CONFIG_IDF_TARGET);
@@ -118,12 +124,12 @@ extern "C" void app_main(void) {
     configureStatusLed();
     startNeopixel();
 
-    unsigned long currentMillis = esp_timer_get_time() / 1000;
-    unsigned long toggleTimeoutMillis = currentMillis;
+    unsigned long currentMillis;
+    unsigned long toggleTimeoutMillis = 0;
 
     while (1) {
         static int animationMode = 0;
-        currentMillis = esp_timer_get_time() / 1000;
+        currentMillis = static_cast<unsigned long>(esp_timer_get_time() / 1000);
 
         // Status LED animation (heartbeat)
         if ((long)(currentMillis - toggleTimeoutMillis) >= 0) {
@@ -137,15 +143,42 @@ extern "C" void app_main(void) {
         // Neopixel animations
         switch (animationMode) {
         case 0:
+            // animationMode = 2; //@@@TODO: remove
             if (animateRanges(currentMillis)) {
                 animationMode++;
             }
             break;
+
         case 1:
             if (animatePause(currentMillis)) {
                 animationMode++;
             }
             break;
+
+        case 2:
+            if (animateBrightness(currentMillis)) {
+                animationMode++;
+            }
+            break;
+
+        case 3:
+            if (animateWobble(currentMillis)) { // wobble the currently lit Neopixels
+                animationMode++;
+            }
+            break;
+
+        case 4:
+            if (animateFadeOut(currentMillis)) {
+                animationMode++;
+            }
+            break;
+
+        case 5:
+            if (animatePause(currentMillis)) {
+                animationMode++;
+            }
+            break;
+
         default:
             animationMode = 0; // reset to the first animation mode
             break;

@@ -26,7 +26,7 @@ static bool chaserInRange(unsigned long currentMillis, size_t startIndex, size_t
     static const size_t nrRotations = 3 * (nrNeopixels / 2) - 3; // 3 full rotations, end with the 3 pixels back in start position
     static int chaseStatus = 0;
     static int rotationCounter = 0;
-    static bool isBackward = 0;
+    static bool isBackward = false;
     static unsigned long timeoutMillis = 0;
 
     switch (chaseStatus) {
@@ -106,6 +106,9 @@ static bool chaserInRange(unsigned long currentMillis, size_t startIndex, size_t
         break;
 
     default:
+        //---------------------------------
+        // Unexpected status
+        //---------------------------------
         ESP_LOGE(TAG, "Unexpected chaseStatus=%d", chaseStatus);
         chaseStatus = 0;
         return (true); // done with error
@@ -153,12 +156,12 @@ bool animateRanges(unsigned long currentMillis) {
         //  Set the pixels for the keepout
         //  and chaser ranges
         //---------------------------------
+        ESP_LOGI(TAG, "Start Ranges animation, quadrant=%d", quadrant);
         npx.setPixelRange(quadrantIndexes[quadrant].startKeepout, quadrantIndexes[quadrant].endKeepout, dimmedWhite);
         npx.setPixelRange(quadrantIndexes[quadrant].startChaser, quadrantIndexes[quadrant].endChaser, neopixelBlack);
         npx.show();
         animationStatus++;
         timeoutMillis = currentMillis + 1000; // delay for visibility of keepout area only
-        ESP_LOGD(TAG, "(Re)Starting animation, quadrant=%d", quadrant);
         break;
 
     case 1:
@@ -206,7 +209,10 @@ bool animateRanges(unsigned long currentMillis) {
         break;
 
     default:
-        ESP_LOGE(TAG, "Unexpected animationStatus=%d", animationStatus);
+        //---------------------------------
+        // Unexpected status
+        //---------------------------------
+        ESP_LOGE(TAG, "Unexpected Ranges animationStatus=%d", animationStatus);
         animationStatus = 0;
         return (true); // done with error
         break;
