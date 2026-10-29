@@ -11,9 +11,12 @@ idf_component_register(
 target_compile_options(${COMPONENT_LIB} PRIVATE
     -Wall
     -Wextra
-    -Wshadow
+    -Wformat
+    -Wformat=2
     -Wconversion
-    -Wsign-conversion
+    -Wimplicit-fallthrough
+    -Wshadow
+    -Werror
 )
 
 target_compile_definitions(${COMPONENT_LIB} PRIVATE LOG_LOCAL_LEVEL=ESP_LOG_DEBUG)
