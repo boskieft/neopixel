@@ -1,0 +1,7 @@
+#----------------------------------------------------------
+#   My ESP32 D1 mini
+#
+#   Has more flash than the standard 2MB
+#----------------------------------------------------------
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"

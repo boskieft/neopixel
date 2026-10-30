@@ -4,9 +4,24 @@ Espressif's ESP-IDF can be used to build and test an ESP-IDF example from this f
 
 ## Software required
 
-Virtual Studio Code (VSC) with the "ESP-IDF" extension version 6.1.0
+Virtual Studio Code (VSC) with the extensions, the relevant ones I have currently:
 
-(in fact ESP-IDF v5.5.5 or higher should work, but the commands and responses may be a bit different than shown here)
+* C/C++
+* C/C++ DevTools
+* C/C++ Extension Pack
+* C/C++ Themes
+* CMake
+* CMake Tools
+* ESP Crash Decoder
+* ESP-IDF - Activated for ESP-IDF v6.1.0 (in fact ESP-IDF v5.5.5 or higher should work, but the commands and responses may be a bit different than shown here)
+* GitHub Actions - Optional, next to using the GitHub website
+* GitHub Repositories
+* Markdownlint
+* Prettier - code formatter
+* Pylance
+* Python
+* Python Debugger
+* Python Environments
 
 ## Select an ESP-IDF example
 
@@ -64,7 +79,7 @@ Below is an overview of the `ESP-IDF: Explorer` commands to run for an initial b
 * `Set current ESP-IDF version` = v6.1.0
 * `Set Flash Method` = UART
 * `Set Espressif Device Target (IDF_TARGET)`, to select the new ESP32xx device
-* `SDK Configuration Editor (menuconfig)`, to enable Debug logging
+* OPTIONAL/OBSOLETE: `SDK Configuration Editor (menuconfig)`, to manually enable the Debug logging
 * `Build Project`
 * `Select Port to Use (COM, tty, usbserial)` = detect, for automatic detection of the COMxx port
 * `Build, Flash and Monitor`
@@ -110,9 +125,13 @@ ESP-IDF-blink
 
 And the file `.vscode\settings.json` is updated to your local build environment.
 
-## Optional: Enable Debug logging
+## Optional: Enable colored Debug logging
 
-By default, only Info messages and above are enabled by EDF-IDF. You can change this to Debug:
+By default, only Info messages and above are enabled by EDF-IDF.
+
+In the file `dev\sdkconfig.defaults` this is changed to Debug, and log lines will be colored.
+
+### OBSOLETE: manual procedure to enable colored Debug logs
 
 VSC, ESP-IDF: Explorer -> `ESP-IDF: SDK Configuration Editor (menuconfig)`
 

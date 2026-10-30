@@ -9,7 +9,8 @@
 
 dist/
 build/
-sdkconfig.*
+sdkconfig
+sdkconfig.old
 compile_commands.json
 
 dev/components/neopixel/

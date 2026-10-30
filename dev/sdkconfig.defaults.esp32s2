@@ -1,0 +1,19 @@
+#----------------------------------------------------------
+#   My ESP32S2 Wemos S2 Mini
+#
+#   Has more flash than the standard 2MB
+#----------------------------------------------------------
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"
+#----------------------------------------------------------
+#   Console settings to use USB CDC i/o UART
+#----------------------------------------------------------
+# CONFIG_CONSOLE_UART_DEFAULT is not set
+CONFIG_CONSOLE_UART_NUM=-1
+CONFIG_ESP32S2_KEEP_USB_ALIVE=y
+CONFIG_ESP_CONSOLE_ROM_SERIAL_PORT_NUM=3
+# CONFIG_ESP_CONSOLE_UART_DEFAULT is not set
+CONFIG_ESP_CONSOLE_UART_NUM=-1
+CONFIG_ESP_CONSOLE_USB_CDC=y
+CONFIG_ESP_CONSOLE_USB_CDC_RX_BUF_SIZE=64
+# CONFIG_ESP_CONSOLE_USB_CDC_SUPPORT_ETS_PRINTF is not set
