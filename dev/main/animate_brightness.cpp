@@ -132,9 +132,7 @@ static bool fadeBrightness(unsigned long currentMillis, bool isUp) {
 
 /*
 *******************************************************************************
-    Animate Fade out
-
-    Precondition is that initial position of the Neopixels is set
+    Animate Fade out with the 4 Neopixels
 
     Returns true when animation is complete
 *******************************************************************************
@@ -151,7 +149,7 @@ bool animateFadeOut(unsigned long currentMillis) {
         //---------------------------------
         originalBrightness = npx.brightness;
         animationStatus++;
-        ESP_LOGI(TAG, "Start Fade Out animation");
+        ESP_LOGI(TAG, "Start Fade Out animation with the 4 Neopixels (R,G,B,W)");
         break;
 
     case 1:

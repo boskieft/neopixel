@@ -92,7 +92,7 @@ PixelColor hueToPixelColor(
 //  Set rainbow colors with an offset to the Neopixels
 //---------------------------------------------------------
 void rainbow(
-    uint8_t offset) { // Offset [0...255] for the rainbow distribution, 0 means Neopixel 0 is red
+    uint8_t offset) { // offset [0...255] for the rainbow distribution, 0 means Neopixel 0 is red
     uint8_t hue;
     for (size_t i = 0; i < nrNeopixels; ++i) {
         hue = static_cast<uint8_t>((offset + (i * 256) / nrNeopixels) & 0xff); // colors distributed across the Neopixels, shifted by offset

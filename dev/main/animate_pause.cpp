@@ -17,7 +17,7 @@ static const char *TAG = "PAUSE";
 
 /*
 *******************************************************************************
-    Ranges animation
+    Pause animation
 
     Returns true when animation is complete
 *******************************************************************************
