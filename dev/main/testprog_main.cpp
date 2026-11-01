@@ -29,6 +29,7 @@ bool animateRanges(unsigned long currentMillis);
 bool animateFadeOut(unsigned long currentMillis);
 bool animateBrightness(unsigned long currentMillis);
 bool animateWobble(unsigned long currentMillis);
+bool animateRainbow(unsigned long currentMillis);
 bool animatePause(unsigned long currentMillis);
 
 /*
@@ -114,8 +115,9 @@ extern "C" void app_main(void) {
     esp_log_level_set("I2S_", ESP_LOG_DEBUG);
     // esp_log_level_set("RANGES", ESP_LOG_DEBUG);
     // esp_log_level_set("WOBBLE", ESP_LOG_DEBUG);
+    // esp_log_level_set("BRIGHT", ESP_LOG_DEBUG);
+    // esp_log_level_set("RAINBOW", ESP_LOG_DEBUG);
     // esp_log_level_set("PAUSE", ESP_LOG_DEBUG);
-    esp_log_level_set("BRIGHT", ESP_LOG_DEBUG);
 
     vTaskDelay(3000 / portTICK_PERIOD_MS); // allow Terminal to connect
 
@@ -143,7 +145,7 @@ extern "C" void app_main(void) {
         // Neopixel animations
         switch (animationMode) {
         case 0:
-            // animationMode = 2; //@@@TODO: remove
+            // animationMode = 5; //@@@TODO: remove
             if (animateRanges(currentMillis)) {
                 animationMode++;
             }
@@ -174,6 +176,12 @@ extern "C" void app_main(void) {
             break;
 
         case 5:
+            if (animateRainbow(currentMillis)) {
+                animationMode++;
+            }
+            break;
+
+        case 6:
             if (animatePause(currentMillis)) {
                 animationMode++;
             }
